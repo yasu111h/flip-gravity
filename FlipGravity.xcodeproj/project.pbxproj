@@ -14,6 +14,8 @@
 		AA000001000000000000005A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000005B /* Assets.xcassets */; };
 		AA000001000000000000006A /* TitleScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000006C /* TitleScene.swift */; };
 		AA000001000000000000007A /* StageSelectScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000007B /* StageSelectScene.swift */; };
+		AA000001000000000000008A /* FlipGravityApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000008B /* FlipGravityApp.swift */; };
+		AA000001000000000000009A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000009B /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,6 +27,8 @@
 		AA000001000000000000006B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA000001000000000000006C /* TitleScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleScene.swift; sourceTree = "<group>"; };
 		AA000001000000000000007B /* StageSelectScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StageSelectScene.swift; sourceTree = "<group>"; };
+		AA000001000000000000008B /* FlipGravityApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlipGravityApp.swift; sourceTree = "<group>"; };
+		AA000001000000000000009B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		AA00000100000000000000FF /* FlipGravity.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlipGravity.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -42,6 +46,8 @@
 		AA000001000000000000BB00 /* FlipGravity */ = {
 			isa = PBXGroup;
 			children = (
+				AA000001000000000000008B /* FlipGravityApp.swift */,
+				AA000001000000000000009B /* ContentView.swift */,
 				AA000001000000000000001B /* AppDelegate.swift */,
 				AA000001000000000000002B /* SceneDelegate.swift */,
 				AA000001000000000000003B /* GameViewController.swift */,
@@ -139,6 +145,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA000001000000000000008A /* FlipGravityApp.swift in Sources */,
+				AA000001000000000000009A /* ContentView.swift in Sources */,
 				AA000001000000000000001A /* AppDelegate.swift in Sources */,
 				AA000001000000000000002A /* SceneDelegate.swift in Sources */,
 				AA000001000000000000003A /* GameViewController.swift in Sources */,
