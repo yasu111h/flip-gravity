@@ -12,6 +12,8 @@
 		AA000001000000000000003A /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000003B /* GameViewController.swift */; };
 		AA000001000000000000004A /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000004B /* GameScene.swift */; };
 		AA000001000000000000005A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000005B /* Assets.xcassets */; };
+		AA000001000000000000006A /* TitleScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000006C /* TitleScene.swift */; };
+		AA000001000000000000007A /* StageSelectScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000007B /* StageSelectScene.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +23,8 @@
 		AA000001000000000000004B /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		AA000001000000000000005B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AA000001000000000000006B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA000001000000000000006C /* TitleScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleScene.swift; sourceTree = "<group>"; };
+		AA000001000000000000007B /* StageSelectScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StageSelectScene.swift; sourceTree = "<group>"; };
 		AA00000100000000000000FF /* FlipGravity.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlipGravity.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -42,6 +46,8 @@
 				AA000001000000000000002B /* SceneDelegate.swift */,
 				AA000001000000000000003B /* GameViewController.swift */,
 				AA000001000000000000004B /* GameScene.swift */,
+				AA000001000000000000006C /* TitleScene.swift */,
+				AA000001000000000000007B /* StageSelectScene.swift */,
 				AA000001000000000000005B /* Assets.xcassets */,
 				AA000001000000000000006B /* Info.plist */,
 			);
@@ -56,7 +62,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		AA000001000000000000BB02 /* MainGroup */ = {
+		AA000001000000000000BB02 = {
 			isa = PBXGroup;
 			children = (
 				AA000001000000000000BB00 /* FlipGravity */,
@@ -107,7 +113,7 @@
 				en,
 				Base,
 			);
-			mainGroup = AA000001000000000000BB02 /* MainGroup */;
+			mainGroup = AA000001000000000000BB02;
 			productRefGroup = AA000001000000000000BB01 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -137,6 +143,8 @@
 				AA000001000000000000002A /* SceneDelegate.swift in Sources */,
 				AA000001000000000000003A /* GameViewController.swift in Sources */,
 				AA000001000000000000004A /* GameScene.swift in Sources */,
+				AA000001000000000000006A /* TitleScene.swift in Sources */,
+				AA000001000000000000007A /* StageSelectScene.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -266,7 +274,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = XW723XTSD4;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = FlipGravity/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -290,7 +298,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = XW723XTSD4;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = FlipGravity/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -329,7 +337,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
 	};
 	rootObject = AA000001000000000000FF00 /* Project object */;
 }

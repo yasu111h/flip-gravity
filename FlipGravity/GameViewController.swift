@@ -19,7 +19,7 @@ class GameViewController: UIViewController {
 
     private func setupScene(in skView: SKView) {
         let screenSize = UIScreen.main.bounds.size
-        let scene = GameScene(size: screenSize)
+        let scene = TitleScene(size: screenSize)
         scene.scaleMode = .aspectFill
 
         skView.showsFPS = false
