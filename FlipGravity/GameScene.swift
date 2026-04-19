@@ -77,6 +77,11 @@ enum SpikeDirection {
 class GameScene: SKScene, SKPhysicsContactDelegate {
 
     private var stageIndex: Int = 0
+
+    // ── グリッド座標系 ──────────────────────────────────────
+    // 1セル = 30pt。シーンサイズ固定: 390×840
+    // 列: 0=左壁左端 〜 13=右壁右端、行: 0=床下端 〜 26=天井ライン
+    private let C: CGFloat = 30
     private var gravityDirection: GravityDirection = .down
     private var playerNode: SKShapeNode!
     private var deathCount = 0
@@ -88,7 +93,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     private var blinkingFloors: [SKShapeNode: Bool] = [:]
 
     convenience init(size: CGSize, stageIndex: Int) {
-        self.init(size: size)
+        self.init(size: CGSize(width: 390, height: 840))
         self.stageIndex = stageIndex
     }
 
@@ -100,10 +105,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         physicsWorld.contactDelegate = self
 
         let border = SKPhysicsBody(edgeLoopFrom: CGRect(
-            x: -size.width,
-            y: -size.height * 2,
-            width: size.width * 3,
-            height: size.height * 4
+            x: -390,
+            y: -840,
+            width: 390 * 3,
+            height: 840 * 3
         ))
         border.categoryBitMask = PhysicsCategory.ground
         border.collisionBitMask = PhysicsCategory.player
@@ -201,22 +206,22 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // ステージ番号に応じてビルド関数を切り替える
     private func buildStage() {
         switch stageIndex {
-        case 0:  buildStage0()
-        case 1:  buildStage1()
-        case 2:  buildStage2()
-        case 3:  buildStage3()
-        case 4:  buildStage4()
-        case 5:  buildStage5()
-        case 6:  buildStage6()
-        case 7:  buildStage7()
-        case 8:  buildStage8()
-        case 9:  buildStage9()
-        case 10: buildStage10()
-        case 11: buildStage11()
-        case 12: buildStage12()
-        case 13: buildStage13()
-        case 14: buildStage14()
-        default: buildStage0()
+        case 0:  buildStage1()
+        case 1:  buildStage2()
+        case 2:  buildStage3()
+        case 3:  buildStage4()
+        case 4:  buildStage5()
+        case 5:  buildStage6()
+        case 6:  buildStage7()
+        case 7:  buildStage8()
+        case 8:  buildStage9()
+        case 9:  buildStage10()
+        case 10: buildStage11()
+        case 11: buildStage12()
+        case 12: buildStage13()
+        case 13: buildStage14()
+        case 14: buildStage15()
+        default: buildStage1()
         }
     }
 
@@ -224,12 +229,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // 【外壁】全ステージ共通の4辺（床・天井・左右の壁）
     // ─────────────────────────────────────────────
     private func addOuterWalls() {
-        let w = size.width
-        let h = size.height
-        addFloor(rect: CGRect(x: 0,      y: 0,      width: w,  height: 30), isTerrain: true) // 床
-        addFloor(rect: CGRect(x: 0,      y: 0,      width: 20, height: h),  isTerrain: true) // 左壁
-        addFloor(rect: CGRect(x: w - 20, y: 0,      width: 20, height: h),  isTerrain: true) // 右壁
-        addFloor(rect: CGRect(x: 0,      y: h - 60, width: w,  height: 60), isTerrain: true) // 天井（上部60ptはHUDバー）
+        // 左壁: col 0（幅30pt=1セル、高さ780pt=26セル）
+        addFloor(rect: CGRect(x: 0, y: 0, width: 30, height: 780), isTerrain: true)
+        // 右壁: col 12（x=360）
+        addFloor(rect: CGRect(x: 360, y: 0, width: 30, height: 780), isTerrain: true)
+        // 天井: row 26（y=780、高さ60pt=HUDバーと一致）
+        addFloor(rect: CGRect(x: 0, y: 780, width: 390, height: 60), isTerrain: true)
     }
 
     // ─────────────────────────────────────────────
@@ -266,7 +271,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       スパイク・溶岩・消える床が少量登場する。
     //       左下からスタートし、足場を踏み替えながら左上のゴールを目指す。
     // ─────────────────────────────────────────────
-    private func buildStage0() {
+    private func buildStage1() {
         let w = size.width; let h = size.height
 
         // プレイヤーの初期出現位置（左下付近）
@@ -306,7 +311,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       左エリア→右エリアへ移動するには重力を切り替えて
     //       仕切りの上か隙間を抜ける必要がある。
     // ─────────────────────────────────────────────
-    private func buildStage1() {
+    private func buildStage2() {
         let w = size.width; let h = size.height
 
         spawnPoint = CGPoint(x: w * 0.15, y: h * 0.12) // 左上付近からスタート
@@ -346,7 +351,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       重力を下向きのままだと即溶岩に落ちる。
     //       上向き重力に切り替えて上半分を渡るのが攻略の鍵。
     // ─────────────────────────────────────────────
-    private func buildStage2() {
+    private func buildStage3() {
         let w = size.width; let h = size.height
 
         spawnPoint = CGPoint(x: w * 0.15, y: h * 0.7) // 左上付近スタート（溶岩の上方）
@@ -385,7 +390,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       踏んだ瞬間から2秒後に消えるため、
     //       順番を考えて素早く渡らないとゴールに届かない。
     // ─────────────────────────────────────────────
-    private func buildStage3() {
+    private func buildStage4() {
         let w = size.width; let h = size.height
 
         spawnPoint = CGPoint(x: w * 0.12, y: h * 0.15) // 左下付近スタート
@@ -424,7 +429,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       4方向すべての重力を使わないとゴールに届かない。
     //       スパイク・溶岩・消える床の全種類が登場する。
     // ─────────────────────────────────────────────
-    private func buildStage4() {
+    private func buildStage5() {
         let w = size.width; let h = size.height
 
         spawnPoint = CGPoint(x: w * 0.12, y: h * 0.12) // 左上スタート
@@ -472,7 +477,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // 概要: 左側を下から上へ登り、中央の橋を渡って右側のゴールへ。
     //       S字を描くような進行ルート。消える床が中継地点に1枚。
     // ─────────────────────────────────────────────
-    private func buildStage5() {
+    private func buildStage6() {
         let w = size.width; let h = size.height
 
         spawnPoint = CGPoint(x: w * 0.15, y: h * 0.12)
@@ -516,7 +521,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // 概要: 左右交互に配置された足場をジグザグに登る。
     //       重力を切り替えて対岸の足場へ飛び移るのが攻略の鍵。
     // ─────────────────────────────────────────────
-    private func buildStage6() {
+    private func buildStage7() {
         let w = size.width; let h = size.height
 
         spawnPoint = CGPoint(x: w * 0.15, y: h * 0.08)
@@ -554,7 +559,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       上部の足場を渡り、左上のゴールを目指す。
     //       天井にはスパイクが並んでいるので注意。
     // ─────────────────────────────────────────────
-    private func buildStage7() {
+    private func buildStage8() {
         let w = size.width; let h = size.height
 
         spawnPoint = CGPoint(x: w * 0.12, y: h * 0.55) // 左中段の足場の上からスタート
@@ -597,7 +602,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // 概要: 消える床が6枚のジグザグ配置。下は溶岩。
     //       踏んだ瞬間から時計が始まるので、素早く次の床へ移動せよ。
     // ─────────────────────────────────────────────
-    private func buildStage8() {
+    private func buildStage9() {
         let w = size.width; let h = size.height
 
         spawnPoint = CGPoint(x: w * 0.12, y: h * 0.12)
@@ -638,7 +643,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // 概要: 中央に縦仕切りで作られた回廊にスパイクが密集。
     //       左右重力を駆使して狭い隙間を通り抜け、右上のゴールへ。
     // ─────────────────────────────────────────────
-    private func buildStage9() {
+    private func buildStage10() {
         let w = size.width; let h = size.height
 
         spawnPoint = CGPoint(x: w * 0.15, y: h * 0.1)
@@ -688,7 +693,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // 概要: 溶岩の海に浮かぶ6つの小島。
     //       重力を切り替えながら島から島へホップして右上のゴールへ。
     // ─────────────────────────────────────────────
-    private func buildStage10() {
+    private func buildStage11() {
         let w = size.width; let h = size.height
 
         spawnPoint = CGPoint(x: w * 0.12, y: h * 0.18)
@@ -730,7 +735,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       天井にスパイクが密集しており上向き重力は極めて危険。
     //       下向きに下りながら消える床も活用する。
     // ─────────────────────────────────────────────
-    private func buildStage11() {
+    private func buildStage12() {
         let w = size.width; let h = size.height
 
         spawnPoint = CGPoint(x: w * 0.12, y: h * 0.88)
@@ -781,7 +786,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // 概要: 縦横の仕切り壁が格子状に配置されたステージ。
     //       各区画の隙間（仕切りの端の開口部）を見つけて右上のゴールへ。
     // ─────────────────────────────────────────────
-    private func buildStage12() {
+    private func buildStage13() {
         let w = size.width; let h = size.height
 
         spawnPoint = CGPoint(x: w * 0.12, y: h * 0.12)
@@ -827,7 +832,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       左上からスタートし、ジグザグに下りながら右下のゴールへ。
     //       消える床を踏んだら即座に次の行動を判断すること。
     // ─────────────────────────────────────────────
-    private func buildStage13() {
+    private func buildStage14() {
         let w = size.width; let h = size.height
 
         spawnPoint = CGPoint(x: w * 0.12, y: h * 0.88)
@@ -883,7 +888,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       中央仕切りで左右に分断され、消える床・溶岩・密集スパイクが全方位から襲う。
     //       4方向の重力を完全に使いこなして突破せよ。
     // ─────────────────────────────────────────────
-    private func buildStage14() {
+    private func buildStage15() {
         let w = size.width; let h = size.height
 
         spawnPoint = CGPoint(x: w * 0.12, y: h * 0.12)
@@ -1045,6 +1050,36 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
         // MARK: - Node Factories
+
+    // MARK: - グリッド座標ヘルパー
+    /// セル座標 → CGPoint（左下基準）
+    private func gp(_ col: CGFloat, _ row: CGFloat) -> CGPoint {
+        CGPoint(x: col * C, y: row * C)
+    }
+    /// セル数 → CGSize
+    private func gs(_ cols: CGFloat, _ rows: CGFloat) -> CGSize {
+        CGSize(width: cols * C, height: rows * C)
+    }
+    /// グリッド座標版 addFloor
+    private func addFloor(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat = 0.5, isTerrain: Bool = false) {
+        addFloor(rect: CGRect(x: x * C, y: y * C, width: w * C, height: h * C), isTerrain: isTerrain)
+    }
+    /// グリッド座標版 addLava
+    private func addLava(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat = 0.5) {
+        addLava(rect: CGRect(x: x * C, y: y * C, width: w * C, height: h * C))
+    }
+    /// グリッド座標版 addBlinkingFloor
+    private func addBlinkingFloor(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat = 0.5) {
+        addBlinkingFloor(rect: CGRect(x: x * C, y: y * C, width: w * C, height: h * C))
+    }
+    /// グリッド座標版 addSpike
+    private func addSpike(col: CGFloat, row: CGFloat, direction: SpikeDirection) {
+        addSpike(at: CGPoint(x: col * C, y: row * C), direction: direction)
+    }
+    /// グリッド座標版 addGoal
+    private func addGoal(col: CGFloat, row: CGFloat) {
+        addGoal(at: CGPoint(x: col * C, y: row * C))
+    }
 
     private func addFloor(rect: CGRect, isTerrain: Bool) {
         let node = SKShapeNode(rect: rect)

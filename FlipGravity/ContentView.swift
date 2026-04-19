@@ -11,8 +11,8 @@ struct ContentView: View {
     }
 
     private func makeScene(size: CGSize) -> SKScene {
-        let scene = TitleScene(size: size)
-        scene.scaleMode = .aspectFill
+        let scene = TitleScene(size: CGSize(width: 390, height: 840))
+        scene.scaleMode = .aspectFit
         return scene
     }
 }
