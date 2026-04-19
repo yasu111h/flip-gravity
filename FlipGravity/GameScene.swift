@@ -269,34 +269,55 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     // ─────────────────────────────────────────────
-    // 【座標の読み方】
+    // 【グリッド座標系の読み方】
     //
-    //  原点(0,0)は画面の左下。
-    //  w = 画面幅（iPhone 16で約390pt）
-    //  h = 画面高さ（iPhone 16で約844pt）
+    //  シーン固定サイズ: 390 × 840 pt
+    //  1セル(C) = 30pt
+    //  グリッド: 13列 × 28行
     //
-    //  例: CGPoint(x: w * 0.5, y: h * 0.5) → 画面中央
-    //      CGPoint(x: w * 0.1, y: h * 0.9) → 左上付近
-    //      CGPoint(x: w * 0.9, y: h * 0.1) → 右下付近
+    //  ┌─ col 0                   col 13 ─┐
+    //  │  ├─ 左壁 ─┤           ├─ 右壁 ─┤│
+    //  │                                   │ ← row 28
+    //  │  [セーフティ余白 row 27-28]        │
+    //  │  [HUDバー         row 25-27]       │
+    //  │  ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ row 25 ← 天井ライン
+    //  │                                   │
+    //  │  プレイエリア内側                  │
+    //  │  col 1〜12, row 1〜24             │
+    //  │                                   │
+    //  │  ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ row 1 ← 床ライン
+    //  └─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ row 0 ─┘
     //
-    //  addFloor の rect:
-    //    CGRect(x: 左端X, y: 下端Y, width: 横幅, height: 縦幅)
-    //    ブロックの左下コーナーからの大きさで指定する
+    //  ── 各ヘルパー関数の引数 ──
     //
-    //  addSpike の at: / direction:
-    //    at: スパイクの「底辺の中心」位置（先端ではなく平らな端の中心）
-    //    direction: .up    → 上向き三角（床の上に置く）
-    //    direction: .down  → 下向き三角（天井に付ける）
-    //    direction: .right → 右向き三角（左壁に付ける）
-    //    direction: .left  → 左向き三角（右壁に付ける）
+    //  addFloor(x: col, y: row, w: 幅[セル], h: 高さ[セル]=0.5)
+    //    → プラットフォーム・地形ブロック。x,y は左下コーナーのセル番号。
+    //    → isTerrain: true で地形色（仕切り壁など）
+    //    例: addFloor(x: 2, y: 5, w: 4)   // col2から4セル幅、row5の高さ0.5セル
     //
-    //  addGoal の at:
-    //    ゴール円の中心座標
-    //    足場の上に置く場合: y = 足場のY + 足場の高さ + ゴール半径(22)
+    //  addLava(x: col, y: row, w: 幅[セル], h: 高さ[セル]=0.5)
+    //    → 溶岩ブロック。x,y は左下コーナー。
+    //
+    //  addBlinkingFloor(x: col, y: row, w: 幅[セル], h: 高さ[セル]=0.5)
+    //    → 消える床。踏むと2秒後に消滅。
+    //
+    //  addSpike(col: 列, row: 行, direction: 向き)
+    //    → col, row はスパイク底辺の中心セル番号。
+    //    → .up = 床の上、.down = 天井の下、.right = 左壁から右、.left = 右壁から左
+    //    例: addSpike(col: 3, row: 1, direction: .up)  // 床面スパイク
+    //        addSpike(col: 6, row: 25, direction: .down) // 天井スパイク
+    //
+    //  addGoal(col: 列, row: 行)
+    //    → ゴール円の中心セル番号。
+    //    → 足場の上: row = 足場のrow + 足場のh + ゴール半径/C(≈0.73)
+    //    例: addGoal(col: 10, row: 22)
+    //
+    //  spawnPoint = gp(col, row)
+    //    → プレイヤー出現位置の中心セル番号。
     // ─────────────────────────────────────────────
 
     // ─────────────────────────────────────────────
-    // STAGE 0: チュートリアル
+    // STAGE 1: チュートリアル
     // 難易度: ★☆☆☆☆
     // 概要: 基本操作を学ぶ最初のステージ。
     //       スパイク・溶岩・消える床が少量登場する。
@@ -321,7 +342,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     // ─────────────────────────────────────────────
-    // STAGE 1: 縦仕切りの迷路
+    // STAGE 2: 縦仕切りの迷路
     // 難易度: ★★☆☆☆
     // 概要: 画面を縦断する2本の仕切り壁がある。
     //       左エリア→右エリアへ移動するには重力を切り替えて
@@ -352,7 +373,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     // ─────────────────────────────────────────────
-    // STAGE 2: 溶岩地獄
+    // STAGE 3: 溶岩地獄
     // 難易度: ★★★☆☆
     // 概要: 下半分に大きな溶岩ゾーンが広がる。
     //       重力を下向きのままだと即溶岩に落ちる。
@@ -383,7 +404,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     // ─────────────────────────────────────────────
-    // STAGE 3: 消える床パズル
+    // STAGE 4: 消える床パズル
     // 難易度: ★★★☆☆
     // 概要: 消える床（水色）が4枚並ぶ。
     //       踏んだ瞬間から2秒後に消えるため、
@@ -413,7 +434,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     // ─────────────────────────────────────────────
-    // STAGE 4: 全方向攻略（上級）
+    // STAGE 5: 全方向攻略（上級）
     // 難易度: ★★★★☆
     // 概要: 画面を縦断する仕切り壁が中央にあり、
     //       4方向すべての重力を使わないとゴールに届かない。
@@ -452,7 +473,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     // ─────────────────────────────────────────────
-    // STAGE 5: S字ルート
+    // STAGE 6: S字ルート
     // 難易度: ★★☆☆☆
     // 概要: 左側を下から上へ登り、中央の橋を渡って右側のゴールへ。
     //       S字を描くような進行ルート。消える床が中継地点に1枚。
@@ -486,7 +507,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     // ─────────────────────────────────────────────
-    // STAGE 6: 交互の足場
+    // STAGE 7: 交互の足場
     // 難易度: ★★★☆☆
     // 概要: 左右交互に配置された足場をジグザグに登る。
     //       重力を切り替えて対岸の足場へ飛び移るのが攻略の鍵。
@@ -516,7 +537,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     // ─────────────────────────────────────────────
-    // STAGE 7: 逆さ溶岩
+    // STAGE 8: 逆さ溶岩
     // 難易度: ★★★☆☆
     // 概要: 画面下半分がほぼ溶岩。上向き重力に素早く切り替えて
     //       上部の足場を渡り、左上のゴールを目指す。
@@ -550,7 +571,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     // ─────────────────────────────────────────────
-    // STAGE 8: 消える床の嵐
+    // STAGE 9: 消える床の嵐
     // 難易度: ★★★★☆
     // 概要: 消える床が6枚のジグザグ配置。下は溶岩。
     //       踏んだ瞬間から時計が始まるので、素早く次の床へ移動せよ。
@@ -582,7 +603,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     // ─────────────────────────────────────────────
-    // STAGE 9: 四方スパイク回廊
+    // STAGE 10: 四方スパイク回廊
     // 難易度: ★★★★☆
     // 概要: 中央に縦仕切りで作られた回廊にスパイクが密集。
     //       左右重力を駆使して狭い隙間を通り抜け、右上のゴールへ。
@@ -622,7 +643,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     // ─────────────────────────────────────────────
-    // STAGE 10: 孤島巡り
+    // STAGE 11: 孤島巡り
     // 難易度: ★★★☆☆
     // 概要: 溶岩の海に浮かぶ6つの小島。
     //       重力を切り替えながら島から島へホップして右上のゴールへ。
@@ -655,7 +676,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     // ─────────────────────────────────────────────
-    // STAGE 11: 上から下へ
+    // STAGE 12: 上から下へ
     // 難易度: ★★★★☆
     // 概要: 左上スタートで、徐々に下に降りながらゴールを目指す。
     //       天井にスパイクが密集しており上向き重力は極めて危険。
@@ -696,7 +717,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     // ─────────────────────────────────────────────
-    // STAGE 12: 格子迷路
+    // STAGE 13: 格子迷路
     // 難易度: ★★★★☆
     // 概要: 縦横の仕切り壁が格子状に配置されたステージ。
     //       各区画の隙間（仕切りの端の開口部）を見つけて右上のゴールへ。
@@ -732,7 +753,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     // ─────────────────────────────────────────────
-    // STAGE 13: 全ギミック総動員
+    // STAGE 14: 全ギミック総動員
     // 難易度: ★★★★★
     // 概要: 全種類のギミックが高密度で出現する最終試練（前半）。
     //       左上からスタートし、ジグザグに下りながら右下のゴールへ。
@@ -776,7 +797,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     // ─────────────────────────────────────────────
-    // STAGE 14: 禁断のステージ
+    // STAGE 15: 禁断のステージ
     // 難易度: ★★★★★
     // 概要: 全ギミック最高密度の最終面。
     //       中央仕切りで左右に分断され、消える床・溶岩・密集スパイクが全方位から襲う。
@@ -828,100 +849,76 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
     // MARK: - Debug Grid
     // デバッグモードON時のみ表示される座標グリッド。
-    // グリッド間隔はソースコードの座標系（pt）と一致する。
-    // 左下が原点(0,0), 右方向がX増加, 上方向がY増加。
+    // 1セル(C=30pt)ごとに線を引き、col/row番号をラベル表示する。
+    // プレイエリア: col 1〜12, row 1〜24
 
     private func addDebugGrid() {
-        let spacing: CGFloat = 50          // グリッド間隔（pt）— ソースコード座標と同単位
         let lineColor  = UIColor(red: 0.0, green: 1.0, blue: 0.5, alpha: 0.18)
-        let label100   = UIColor(red: 0.0, green: 1.0, blue: 0.5, alpha: 0.85)
-        let label50    = UIColor(red: 0.0, green: 1.0, blue: 0.5, alpha: 0.45)
+        let labelMain  = UIColor(red: 0.0, green: 1.0, blue: 0.5, alpha: 0.85)
+        let labelSub   = UIColor(red: 0.0, green: 1.0, blue: 0.5, alpha: 0.40)
 
-        // ── 縦線 + X座標ラベル ──
-        var x: CGFloat = 0
-        while x <= size.width {
+        // ── 縦線 + col ラベル ──
+        // col 0〜13（セル境界線）
+        for col in 0...13 {
+            let x = CGFloat(col) * C
             let path = CGMutablePath()
             path.move(to: CGPoint(x: x, y: 0))
             path.addLine(to: CGPoint(x: x, y: size.height))
             let line = SKShapeNode(path: path)
             line.strokeColor = lineColor
-            line.lineWidth = (Int(x) % 100 == 0) ? 0.8 : 0.4
+            line.lineWidth = (col % 2 == 0) ? 0.8 : 0.4
             line.zPosition = 55
             addChild(line)
 
-            // 100pt おきにX座標ラベル（画面下部）
-            if Int(x) % 100 == 0 && x > 0 {
-                let lbl = SKLabelNode(text: "\(Int(x))")
-                lbl.fontName = "AvenirNext-Medium"
-                lbl.fontSize = 9
-                lbl.fontColor = label100
-                lbl.horizontalAlignmentMode = .center
-                lbl.verticalAlignmentMode = .bottom
-                lbl.position = CGPoint(x: x, y: 33)
-                lbl.zPosition = 56
-                addChild(lbl)
-            } else if Int(x) % 100 != 0 && x > 0 {
-                // 50pt ラベル（小さめ）
-                let lbl = SKLabelNode(text: "\(Int(x))")
-                lbl.fontName = "AvenirNext-Medium"
-                lbl.fontSize = 7
-                lbl.fontColor = label50
-                lbl.horizontalAlignmentMode = .center
-                lbl.verticalAlignmentMode = .bottom
-                lbl.position = CGPoint(x: x, y: 33)
-                lbl.zPosition = 56
-                addChild(lbl)
-            }
-            x += spacing
+            // プレイエリア内のcol（1〜12）にラベル
+            guard col >= 1 && col <= 12 else { continue }
+            let lbl = SKLabelNode(text: "c\(col)")
+            lbl.fontName = "AvenirNext-Medium"
+            lbl.fontSize = col % 2 == 0 ? 8 : 6
+            lbl.fontColor = col % 2 == 0 ? labelMain : labelSub
+            lbl.horizontalAlignmentMode = .center
+            lbl.verticalAlignmentMode = .bottom
+            lbl.position = CGPoint(x: x + C / 2, y: C + 2)   // 各セルの中央、床の上
+            lbl.zPosition = 56
+            addChild(lbl)
         }
 
-        // ── 横線 + Y座標ラベル ──
-        var y: CGFloat = 0
-        while y <= size.height {
+        // ── 横線 + row ラベル ──
+        // row 0〜28（セル境界線）
+        for row in 0...28 {
+            let y = CGFloat(row) * C
             let path = CGMutablePath()
             path.move(to: CGPoint(x: 0, y: y))
             path.addLine(to: CGPoint(x: size.width, y: y))
             let line = SKShapeNode(path: path)
             line.strokeColor = lineColor
-            line.lineWidth = (Int(y) % 100 == 0) ? 0.8 : 0.4
+            line.lineWidth = (row % 2 == 0) ? 0.8 : 0.4
             line.zPosition = 55
             addChild(line)
 
-            // 100pt おきにY座標ラベル（画面左端）
-            if Int(y) % 100 == 0 && y > 30 {
-                let lbl = SKLabelNode(text: "\(Int(y))")
-                lbl.fontName = "AvenirNext-Medium"
-                lbl.fontSize = 9
-                lbl.fontColor = label100
-                lbl.horizontalAlignmentMode = .left
-                lbl.verticalAlignmentMode = .center
-                lbl.position = CGPoint(x: 22, y: y)
-                lbl.zPosition = 56
-                addChild(lbl)
-            } else if Int(y) % 100 != 0 && y > 30 {
-                let lbl = SKLabelNode(text: "\(Int(y))")
-                lbl.fontName = "AvenirNext-Medium"
-                lbl.fontSize = 7
-                lbl.fontColor = label50
-                lbl.horizontalAlignmentMode = .left
-                lbl.verticalAlignmentMode = .center
-                lbl.position = CGPoint(x: 22, y: y)
-                lbl.zPosition = 56
-                addChild(lbl)
-            }
-            y += spacing
+            // プレイエリア内のrow（1〜24）にラベル
+            guard row >= 1 && row <= 24 else { continue }
+            let lbl = SKLabelNode(text: "r\(row)")
+            lbl.fontName = "AvenirNext-Medium"
+            lbl.fontSize = row % 2 == 0 ? 8 : 6
+            lbl.fontColor = row % 2 == 0 ? labelMain : labelSub
+            lbl.horizontalAlignmentMode = .left
+            lbl.verticalAlignmentMode = .center
+            lbl.position = CGPoint(x: C + 2, y: y + C / 2)   // 左壁の右、各セルの中央
+            lbl.zPosition = 56
+            addChild(lbl)
         }
 
-        // ── 情報バッジ（グリッド間隔 + 画面サイズ表示）──
-        let infoNode = SKShapeNode(rectOf: CGSize(width: 160, height: 36), cornerRadius: 6)
-        infoNode.position = CGPoint(x: size.width - 90, y: size.height - 90)
+        // ── 情報バッジ ──
+        let infoNode = SKShapeNode(rectOf: CGSize(width: 170, height: 36), cornerRadius: 6)
+        infoNode.position = CGPoint(x: size.width - 95, y: size.height - 90)
         infoNode.fillColor = UIColor(red: 0, green: 0.1, blue: 0, alpha: 0.75)
         infoNode.strokeColor = UIColor(red: 0.0, green: 1.0, blue: 0.5, alpha: 0.6)
         infoNode.lineWidth = 1
         infoNode.zPosition = 115
         addChild(infoNode)
 
-        let infoText = SKLabelNode(text: "GRID \(Int(spacing))pt  w=\(Int(size.width)) h=\(Int(size.height))")
+        let infoText = SKLabelNode(text: "GRID C=\(Int(C))pt  13col×28row")
         infoText.fontName = "AvenirNext-Bold"
         infoText.fontSize = 10
         infoText.fontColor = UIColor(red: 0.0, green: 1.0, blue: 0.5, alpha: 1.0)
