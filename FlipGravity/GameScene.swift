@@ -83,8 +83,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // 列: 0=左壁左端 〜 13=右壁右端、行: 0=床下端 〜 26=天井ライン
     private let C: CGFloat = 30
     private let ballSizeCells: CGFloat = 1       // ボールサイズ（セル単位）1=1マス分
-    private let goalSizeCells: CGFloat = 2        // ゴールサイズ（セル単位）1=1マス分
-    private let platformThickCells: CGFloat = 1  // 床・溶岩・消える床のデフォルト厚み（セル単位）1=1マス分
+    private let goalSizeCells: CGFloat = 1.5        // ゴールサイズ（セル単位）1=1マス分
+    private let platformThickCells: CGFloat = 0.5  // 床・溶岩・消える床のデフォルト厚み（セル単位）1=1マス分
     private var gravityDirection: GravityDirection = .down
     private var playerNode: SKShapeNode!
     private var deathCount = 0
@@ -336,8 +336,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addFloor(x: 4, y: 23, w: 3)
         addSpike(col: 1, row: 1, direction: .up)
         addSpike(col: 1.5, row: 1, direction: .up)
-        addSpike(col: 8.5, row: 10, direction: .up)
-        addSpike(col: 10, row: 24, direction: .down)
+        addSpike(col: 8, row: 10.5, direction: .up)
+        addSpike(col: 9.5, row: 24, direction: .down)
         addLava(x: 4, y: 1, w: 5)
         addBlinkingFloor(x: 6, y: 15, w: 3)
         addGoal(col: 5, row: 23.5)
@@ -1143,7 +1143,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         crossNode.lineWidth = 1.5
         crossNode.zPosition = 1
         playerNode.addChild(crossNode)
-        let body = SKPhysicsBody(circleOfRadius: radius)
+        let body = SKPhysicsBody(circleOfRadius: radius * 0.85)
         body.isDynamic = true
         body.restitution = 0.1
         body.friction = 0.3
