@@ -333,15 +333,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addFloor(x: 1, y: 3, w: 4)
         addFloor(x: 6, y: 10, w: 3)
         addFloor(x: 8, y: 18, w: 3)
-        addFloor(x: 1, y: 20, w: 3)
-        addFloor(x: 4, y: 23, w: 3)
+        addFloor(x: 1, y: 13, w: 3)
+        addFloor(x: 4, y: 20.5, w: 3)
         addSpike(col: 1, row: 1, direction: .up)
         addSpike(col: 1.5, row: 1, direction: .up)
         addSpike(col: 8, row: 10.5, direction: .up)
         addSpike(col: 9.5, row: 24, direction: .down)
         addLava(x: 4, y: 1, w: 5)
         addBlinkingFloor(x: 6, y: 15, w: 3)
-        addGoal(col: 5, row: 23.5)
+        addGoal(col: 5, row: 21)
         spawnPlayer()
     }
 
@@ -358,7 +358,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // 縦仕切り左: x=5, y=1, w=0.5, h=14
         addFloor(x: 5, y: 1, w: 0.5, h: 14, isTerrain: true)
         // 縦仕切り右: x=7.5, y=12, w=0.5, h=14
-        addFloor(x: 7.5, y: 12, w: 0.5, h: 14, isTerrain: true)
+        addFloor(x: 7.5, y: 12, w: 0.5, h: 12, isTerrain: true)
         // 足場左中段
         addFloor(x: 1, y: 8, w: 3)
         // 足場左上段
@@ -369,10 +369,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addFloor(x: 8, y: 17, w: 2.5)
         addSpike(col: 2, row: 24, direction: .down)
         addSpike(col: 8.5, row: 1, direction: .up)
-        addSpike(col: 8.5, row: 11, direction: .down)
         addSpike(col: 10.5, row: 1, direction: .up)
         addLava(x: 1, y: 11, w: 2.5)
-        addGoal(col: 9.5, row: 17.5)
+        addGoal(col: 8, row: 17.5)
         spawnPlayer()
     }
 
@@ -387,19 +386,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         spawnPoint = gp(1.5, 16.5)
         addOuterWalls()
         // 溶岩（下半分・h を明示して縦に大きく）
-        addLava(x: 1, y: 1, w: 4, h: 10)      // 左下大溶岩
-        addLava(x: 6, y: 1, w: 2.5, h: 10)    // 中央下溶岩
+        addLava(x: 1, y: 1, w: 8, h: 10)      // 左下大溶岩
         addLava(x: 10, y: 1, w: 1, h: 10)     // 右端細い溶岩
-        // 足場（上半分）
+        // 足場
         addFloor(x: 1, y: 17, w: 3)      // 左上足場（スタート台）
         addFloor(x: 4.5, y: 20, w: 4)    // 中央上の長い足場
         addFloor(x: 8, y: 15, w: 2.5)    // 右中段足場（ゴール台）
-        addFloor(x: 4, y: 24, w: 4.5)    // 最上段足場
-        // 中継足場
-        addFloor(x: 4, y: 11, w: 1.5)    // 中段左の中継
-        addFloor(x: 9, y: 11, w: 1)      // 中段右の中継
+        addFloor(x: 4, y: 22.5, w: 4.5)    // 最上段足場
+        addFloor(x: 1, y: 11, w: 4)    // 中段左の中継
         // 天井スパイク
-        addSpike(col: 6, row: 24, direction: .down)
         addSpike(col: 2.5, row: 24, direction: .down)
         addSpike(col: 9.5, row: 24, direction: .down)
         // ゴール
@@ -420,20 +415,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // 固定足場
         addFloor(x: 1, y: 2.5, w: 2.5)     // 左下スタート台
         addFloor(x: 9.5, y: 14, w: 1)       // 右中段の固定足場
-        addFloor(x: 9.5, y: 23, w: 1)       // 右上の固定足場（ゴール台）
         // 消える床
         addBlinkingFloor(x: 3.5, y: 5, w: 2.5)   // ①
         addBlinkingFloor(x: 7, y: 10, w: 2.5)     // ②
         addBlinkingFloor(x: 3, y: 15.5, w: 2.5)   // ③
         addBlinkingFloor(x: 7, y: 20, w: 2.5)     // ④
-        // スパイク
-        addSpike(col: 5.5, row: 1, direction: .up)
-        addSpike(col: 7.5, row: 1, direction: .up)
-        addSpike(col: 9.5, row: 1, direction: .up)
         // 溶岩
-        addLava(x: 2.5, y: 1, w: 3)
+        addLava(x: 1, y: 1, w: 11)
         // ゴール
-        addGoal(col: 9.5, row: 23.5)
+        addGoal(col: 7.5, row: 21.5)
         spawnPlayer()
     }
 
@@ -463,13 +453,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addBlinkingFloor(x: 7, y: 15, w: 2.5)  // 右側の消える床
         // スパイク
         addSpike(col: 3.5, row: 1, direction: .up)
-        addSpike(col: 8.5, row: 1, direction: .up)
         addSpike(col: 3.5, row: 24, direction: .down)
         addSpike(col: 8.5, row: 24, direction: .down)
         addSpike(col: 1, row: 13, direction: .right)
         addSpike(col: 11, row: 13, direction: .left)
         // 溶岩
-        addLava(x: 1, y: 1, w: 3)
         addLava(x: 7.5, y: 1, w: 3)
         // ゴール
         addGoal(col: 9.5, row: 20.5)
@@ -490,23 +478,27 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addFloor(x: 1, y: 7, w: 3)        // L2: 左中下段
         addFloor(x: 1, y: 12, w: 3.5)    // L3: 左中上段
         // 中央の橋
-        addFloor(x: 3, y: 16, w: 6.5)    // 橋（長い）
+        addFloor(x: 3, y: 16, w: 6)    // 橋（長い）
         // 右側の足場
         addFloor(x: 8, y: 12, w: 2.5)    // R1: 右中段
-        addFloor(x: 8, y: 20, w: 2.5)    // R2: 右上段（ゴール台）
+        addFloor(x: 6, y: 20, w: 4.5)    // R2: 右上段
+        addFloor(x: 17.5, y: 10, w: 1)    //
+        // 壁
+        addFloor(x: 4, y: 16.5, w: platformThickCells, h: 7)    // 縦長の壁
         // 消える床
         addBlinkingFloor(x: 5, y: 9, w: 2.5)
         // スパイク
-        addSpike(col: 4, row: 1, direction: .up)
+        addSpike(col: 6, row: 20.5, direction: .up)
         addSpike(col: 6, row: 1, direction: .up)
         addSpike(col: 8, row: 1, direction: .up)
-        addSpike(col: 10.5, row: 16.5, direction: .up)
-        addSpike(col: 1.5, row: 24, direction: .down)
+        addSpike(col: 10, row: 16.5, direction: .down)
+        addSpike(col: 1, row: 24, direction: .down)
+        addSpike(col: 22, row: 5, direction: .right)
+        addSpike(col: 4.5, row: 16.5, direction: .up)
         // 溶岩
-        addLava(x: 4, y: 1, w: 1)
-        addLava(x: 9.5, y: 1, w: 1)
+        addLava(x: 9.5, y: 1, w: 1, h: 4)
         // ゴール
-        addGoal(col: 9.5, row: 20.5)
+        addGoal(col: 7, row: 17.5)
         spawnPlayer()
     }
 
@@ -527,12 +519,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addFloor(x: 1, y: 19, w: 4.5)    // Z5: 左上
         addFloor(x: 6.5, y: 23, w: 4)    // Z6: 右上（ゴール台）
         // スパイク
-        addSpike(col: 2, row: 1, direction: .up)
-        addSpike(col: 8.5, row: 1, direction: .up)
+        addSpike(col: 8, row: 1, direction: .up)
         addSpike(col: 5, row: 4.5, direction: .up)
-        addSpike(col: 10.5, row: 8, direction: .up)
+        addSpike(col: 9.5, row: 8, direction: .up)
         addSpike(col: 5, row: 12, direction: .up)
-        addSpike(col: 1.5, row: 24, direction: .down)
+        addSpike(col: 1, row: 24, direction: .down)
         // 溶岩
         addLava(x: 4.5, y: 1, w: 2)
         // ゴール
