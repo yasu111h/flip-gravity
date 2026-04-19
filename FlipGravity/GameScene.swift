@@ -83,7 +83,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // 列: 0=左壁左端 〜 13=右壁右端、行: 0=床下端 〜 26=天井ライン
     private let C: CGFloat = 30
     private let ballSizeCells: CGFloat = 1       // ボールサイズ（セル単位）1=1マス分
-    private let ballBodyRatio: CGFloat = 0.85    // ボール当たり判定の割合（1.0=視覚と同サイズ）
+    private let ballBodyRatio: CGFloat = 0.9    // ボール当たり判定の割合（1.0=視覚と同サイズ）
     private let goalSizeCells: CGFloat = 1.5        // ゴールサイズ（セル単位）1=1マス分
     private let platformThickCells: CGFloat = 0.5  // 床・溶岩・消える床のデフォルト厚み（セル単位）1=1マス分
     private var gravityDirection: GravityDirection = .down
@@ -386,10 +386,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     private func buildStage3() {
         spawnPoint = gp(1.5, 16.5)
         addOuterWalls()
-        // 溶岩（下半分）
-        addLava(x: 1, y: 1, w: 4)        // 左下大溶岩
-        addLava(x: 6, y: 1, w: 2.5)      // 中央下溶岩
-        addLava(x: 10, y: 1, w: 1)       // 右端細い溶岩
+        // 溶岩（下半分・h を明示して縦に大きく）
+        addLava(x: 1, y: 1, w: 4, h: 10)      // 左下大溶岩
+        addLava(x: 6, y: 1, w: 2.5, h: 10)    // 中央下溶岩
+        addLava(x: 10, y: 1, w: 1, h: 10)     // 右端細い溶岩
         // 足場（上半分）
         addFloor(x: 1, y: 17, w: 3)      // 左上足場（スタート台）
         addFloor(x: 4.5, y: 20, w: 4)    // 中央上の長い足場
