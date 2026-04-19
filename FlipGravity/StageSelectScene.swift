@@ -12,7 +12,8 @@ class StageSelectScene: SKScene {
     // MARK: - Scene Setup
 
     override func didMove(to view: SKView) {
-        backgroundColor = UIColor(red: 0.05, green: 0.05, blue: 0.10, alpha: 1.0)
+        let theme = ThemeManager.shared
+        backgroundColor = theme.backgroundColor
 
         setupBackground()
         setupTitle()
@@ -23,6 +24,46 @@ class StageSelectScene: SKScene {
     // MARK: - Background
 
     private func setupBackground() {
+        let theme = ThemeManager.shared
+
+        if theme.hasGrid {
+            addBackgroundGrid()
+        }
+        if theme.hasStars {
+            addBackgroundStars()
+        }
+    }
+
+    private func addBackgroundGrid() {
+        let gridSpacing: CGFloat = 60
+        let gridColor = UIColor(white: 1.0, alpha: 0.05)
+        var x: CGFloat = 0
+        while x <= size.width {
+            let path = CGMutablePath()
+            path.move(to: CGPoint(x: x, y: 0))
+            path.addLine(to: CGPoint(x: x, y: size.height))
+            let line = SKShapeNode(path: path)
+            line.strokeColor = gridColor
+            line.lineWidth = 1
+            line.zPosition = -10
+            addChild(line)
+            x += gridSpacing
+        }
+        var y: CGFloat = 0
+        while y <= size.height {
+            let path = CGMutablePath()
+            path.move(to: CGPoint(x: 0, y: y))
+            path.addLine(to: CGPoint(x: size.width, y: y))
+            let line = SKShapeNode(path: path)
+            line.strokeColor = gridColor
+            line.lineWidth = 1
+            line.zPosition = -10
+            addChild(line)
+            y += gridSpacing
+        }
+    }
+
+    private func addBackgroundStars() {
         for _ in 0..<40 {
             let star = SKShapeNode(circleOfRadius: CGFloat.random(in: 0.5...1.5))
             star.position = CGPoint(
@@ -39,10 +80,12 @@ class StageSelectScene: SKScene {
     // MARK: - Title
 
     private func setupTitle() {
+        let theme = ThemeManager.shared
+
         let titleLabel = SKLabelNode(text: "SELECT STAGE")
         titleLabel.fontName = "AvenirNext-Heavy"
         titleLabel.fontSize = 32
-        titleLabel.fontColor = UIColor(red: 0.4, green: 0.8, blue: 1.0, alpha: 1.0)
+        titleLabel.fontColor = theme.hudColor
         titleLabel.horizontalAlignmentMode = .center
         titleLabel.verticalAlignmentMode = .center
         titleLabel.position = CGPoint(x: size.width / 2, y: size.height - 60)
@@ -53,10 +96,12 @@ class StageSelectScene: SKScene {
     // MARK: - Back Button
 
     private func setupBackButton() {
+        let theme = ThemeManager.shared
+
         let backBg = SKShapeNode(rectOf: CGSize(width: 80, height: 36), cornerRadius: 8)
         backBg.position = CGPoint(x: 55, y: size.height - 60)
-        backBg.fillColor = UIColor(white: 0.2, alpha: 0.8)
-        backBg.strokeColor = UIColor(white: 0.5, alpha: 0.6)
+        backBg.fillColor = theme.hudColor.withAlphaComponent(0.1)
+        backBg.strokeColor = theme.hudColor.withAlphaComponent(0.4)
         backBg.lineWidth = 1.5
         backBg.zPosition = 10
         backBg.name = "backButton"
@@ -65,7 +110,7 @@ class StageSelectScene: SKScene {
         let backLabel = SKLabelNode(text: "< BACK")
         backLabel.fontName = "AvenirNext-Bold"
         backLabel.fontSize = 14
-        backLabel.fontColor = UIColor(white: 0.9, alpha: 0.9)
+        backLabel.fontColor = theme.hudColor.withAlphaComponent(0.9)
         backLabel.horizontalAlignmentMode = .center
         backLabel.verticalAlignmentMode = .center
         backLabel.zPosition = 11
@@ -118,22 +163,22 @@ class StageSelectScene: SKScene {
         isCleared: Bool,
         isUnlocked: Bool
     ) {
-        // カード背景
+        let theme = ThemeManager.shared
         let card = SKShapeNode(rectOf: cardSize, cornerRadius: 10)
         card.position = position
         card.zPosition = 10
 
         if isCleared {
-            card.fillColor = UIColor(red: 0.1, green: 0.5, blue: 0.3, alpha: 0.9)
-            card.strokeColor = UIColor(red: 0.0, green: 1.0, blue: 0.5, alpha: 0.8)
+            card.fillColor = theme.goalFillColor.withAlphaComponent(0.25)
+            card.strokeColor = theme.goalFillColor.withAlphaComponent(0.8)
             card.lineWidth = 2
         } else if isUnlocked {
-            card.fillColor = UIColor(red: 0.1, green: 0.2, blue: 0.4, alpha: 0.9)
-            card.strokeColor = UIColor(red: 0.4, green: 0.7, blue: 1.0, alpha: 0.7)
+            card.fillColor = theme.hudColor.withAlphaComponent(0.1)
+            card.strokeColor = theme.hudColor.withAlphaComponent(0.5)
             card.lineWidth = 1.5
         } else {
-            card.fillColor = UIColor(red: 0.1, green: 0.1, blue: 0.15, alpha: 0.9)
-            card.strokeColor = UIColor(white: 0.3, alpha: 0.5)
+            card.fillColor = theme.hudColor.withAlphaComponent(0.05)
+            card.strokeColor = theme.hudColor.withAlphaComponent(0.2)
             card.lineWidth = 1
         }
 
@@ -147,8 +192,8 @@ class StageSelectScene: SKScene {
         numberLabel.fontName = "AvenirNext-Heavy"
         numberLabel.fontSize = 20
         numberLabel.fontColor = isUnlocked
-            ? UIColor(white: 1.0, alpha: 0.95)
-            : UIColor(white: 0.4, alpha: 0.7)
+            ? theme.hudColor
+            : theme.hudColor.withAlphaComponent(0.35)
         numberLabel.horizontalAlignmentMode = .center
         numberLabel.verticalAlignmentMode = .center
         numberLabel.position = CGPoint(x: 0, y: isCleared ? 6 : 0)
@@ -161,7 +206,7 @@ class StageSelectScene: SKScene {
             let checkLabel = SKLabelNode(text: "✓")
             checkLabel.fontName = "AvenirNext-Heavy"
             checkLabel.fontSize = 13
-            checkLabel.fontColor = UIColor(red: 0.0, green: 1.0, blue: 0.5, alpha: 1.0)
+            checkLabel.fontColor = theme.goalFillColor
             checkLabel.horizontalAlignmentMode = .center
             checkLabel.verticalAlignmentMode = .center
             checkLabel.position = CGPoint(x: 0, y: -10)
@@ -217,7 +262,7 @@ class StageSelectScene: SKScene {
         let titleScene = TitleScene(size: size)
         titleScene.scaleMode = scaleMode
         let transition = SKTransition.fade(
-            with: UIColor(red: 0.05, green: 0.05, blue: 0.10, alpha: 1.0),
+            with: ThemeManager.shared.transitionColor,
             duration: 0.4
         )
         view?.presentScene(titleScene, transition: transition)
@@ -227,7 +272,7 @@ class StageSelectScene: SKScene {
         let gameScene = GameScene(size: size, stageIndex: index)
         gameScene.scaleMode = scaleMode
         let transition = SKTransition.fade(
-            with: UIColor(red: 0.05, green: 0.05, blue: 0.10, alpha: 1.0),
+            with: ThemeManager.shared.transitionColor,
             duration: 0.4
         )
         view?.presentScene(gameScene, transition: transition)

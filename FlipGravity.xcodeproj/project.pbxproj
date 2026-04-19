@@ -7,21 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AA000001000000000000001A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000001B /* AppDelegate.swift */; };
-		AA000001000000000000002A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000002B /* SceneDelegate.swift */; };
-		AA000001000000000000003A /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000003B /* GameViewController.swift */; };
 		AA000001000000000000004A /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000004B /* GameScene.swift */; };
 		AA000001000000000000005A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000005B /* Assets.xcassets */; };
 		AA000001000000000000006A /* TitleScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000006C /* TitleScene.swift */; };
 		AA000001000000000000007A /* StageSelectScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000007B /* StageSelectScene.swift */; };
 		AA000001000000000000008A /* FlipGravityApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000008B /* FlipGravityApp.swift */; };
 		AA000001000000000000009A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000009B /* ContentView.swift */; };
+		AA000001000000000000010A /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000010B /* ThemeManager.swift */; };
+		AA000001000000000000011A /* SettingsScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000011B /* SettingsScene.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		AA000001000000000000001B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		AA000001000000000000002B /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		AA000001000000000000003B /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		AA000001000000000000004B /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		AA000001000000000000005B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AA000001000000000000006B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -30,6 +26,8 @@
 		AA000001000000000000008B /* FlipGravityApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlipGravityApp.swift; sourceTree = "<group>"; };
 		AA000001000000000000009B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		AA00000100000000000000FF /* FlipGravity.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlipGravity.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA000001000000000000010B /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
+		AA000001000000000000011B /* SettingsScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScene.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,12 +46,11 @@
 			children = (
 				AA000001000000000000008B /* FlipGravityApp.swift */,
 				AA000001000000000000009B /* ContentView.swift */,
-				AA000001000000000000001B /* AppDelegate.swift */,
-				AA000001000000000000002B /* SceneDelegate.swift */,
-				AA000001000000000000003B /* GameViewController.swift */,
 				AA000001000000000000004B /* GameScene.swift */,
 				AA000001000000000000006C /* TitleScene.swift */,
 				AA000001000000000000007B /* StageSelectScene.swift */,
+				AA000001000000000000010B /* ThemeManager.swift */,
+				AA000001000000000000011B /* SettingsScene.swift */,
 				AA000001000000000000005B /* Assets.xcassets */,
 				AA000001000000000000006B /* Info.plist */,
 			);
@@ -147,12 +144,11 @@
 			files = (
 				AA000001000000000000008A /* FlipGravityApp.swift in Sources */,
 				AA000001000000000000009A /* ContentView.swift in Sources */,
-				AA000001000000000000001A /* AppDelegate.swift in Sources */,
-				AA000001000000000000002A /* SceneDelegate.swift in Sources */,
-				AA000001000000000000003A /* GameViewController.swift in Sources */,
 				AA000001000000000000004A /* GameScene.swift in Sources */,
 				AA000001000000000000006A /* TitleScene.swift in Sources */,
 				AA000001000000000000007A /* StageSelectScene.swift in Sources */,
+				AA000001000000000000010A /* ThemeManager.swift in Sources */,
+				AA000001000000000000011A /* SettingsScene.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
