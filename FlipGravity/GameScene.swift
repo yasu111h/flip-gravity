@@ -227,6 +227,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         case 12: buildStage13()
         case 13: buildStage14()
         case 14: buildStage15()
+        case 15: buildStage16()
+        case 16: buildStage17()
+        case 17: buildStage18()
+        case 18: buildStage19()
+        case 19: buildStage20()
         default: buildStage1()
         }
     }
@@ -506,342 +511,495 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     // ─────────────────────────────────────────────
-    // STAGE 7: 交互の足場
+    // STAGE 7: スパイク密林
     // 難易度: ★★★☆☆
-    // 概要: 左右交互に配置された足場をジグザグに登る。
-    //       重力を切り替えて対岸の足場へ飛び移るのが攻略の鍵。
+    // 概要: 床と天井にスパイクが密集。
+    //       安全な足場を慎重に渡りながら右上のゴールへ。
     // ─────────────────────────────────────────────
     private func buildStage7() {
-        spawnPoint = gp(1.5, 1.5)
+        spawnPoint = gp(1, 2)
         addOuterWalls()
-        // ジグザグ足場
-        addFloor(x: 1, y: 4, w: 4.5)     // Z1: 左下
-        addFloor(x: 6.5, y: 7.5, w: 4)   // Z2: 右中下
-        addFloor(x: 1, y: 11.5, w: 4.5)  // Z3: 左中
-        addFloor(x: 6.5, y: 15.5, w: 4)  // Z4: 右中上
-        addFloor(x: 1, y: 19, w: 4.5)    // Z5: 左上
-        addFloor(x: 6.5, y: 23, w: 4)    // Z6: 右上（ゴール台）
-        // スパイク
-        addSpike(col: 8, row: 1, direction: .up)
-        addSpike(col: 5, row: 4.5, direction: .up)
-        addSpike(col: 9.5, row: 8, direction: .up)
-        addSpike(col: 5, row: 12, direction: .up)
+        addFloor(x: 1, y: 2, w: 2)
+        addFloor(x: 4, y: 5, w: 2)
+        addFloor(x: 8, y: 8, w: 3)
+        addFloor(x: 2, y: 11, w: 3)
+        addFloor(x: 7, y: 14, w: 3)
+        addFloor(x: 2, y: 17, w: 3)
+        addFloor(x: 7, y: 21, w: 3)
+        // 床スパイク
+        addSpike(col: 3, row: 1, direction: .up)
+        addSpike(col: 4, row: 1, direction: .up)
+        addSpike(col: 5, row: 1, direction: .up)
+        addSpike(col: 6, row: 1, direction: .up)
+        addSpike(col: 7, row: 1, direction: .up)
+        addSpike(col: 9, row: 1, direction: .up)
+        addSpike(col: 10, row: 1, direction: .up)
+        // 天井スパイク
         addSpike(col: 1, row: 24, direction: .down)
-        // 溶岩
-        addLava(x: 4.5, y: 1, w: 2)
-        // ゴール
-        addGoal(col: 9, row: 23.5)
+        addSpike(col: 2, row: 24, direction: .down)
+        addSpike(col: 4, row: 24, direction: .down)
+        addSpike(col: 5, row: 24, direction: .down)
+        addSpike(col: 6, row: 24, direction: .down)
+        addSpike(col: 8, row: 24, direction: .down)
+        addSpike(col: 9, row: 24, direction: .down)
+        addSpike(col: 10, row: 24, direction: .down)
+        addLava(x: 1, y: 1, w: 2)
+        addLava(x: 8, y: 1, w: 1)
+        addGoal(col: 8, row: 22)
         spawnPlayer()
     }
 
     // ─────────────────────────────────────────────
     // STAGE 8: 逆さ溶岩
     // 難易度: ★★★☆☆
-    // 概要: 画面下半分がほぼ溶岩。上向き重力に素早く切り替えて
-    //       上部の足場を渡り、左上のゴールを目指す。
-    //       天井にはスパイクが並んでいるので注意。
+    // 概要: 溶岩が上にある異常事態。
+    //       上向き重力に切り替えると即死。下半分を渡れ。
     // ─────────────────────────────────────────────
     private func buildStage8() {
-        spawnPoint = gp(1, 14.5)
+        spawnPoint = gp(1, 2)
         addOuterWalls()
-        // スタート台（左中段）
-        addFloor(x: 1, y: 14, w: 2.5)
-        // 上部の足場
-        addFloor(x: 4, y: 21, w: 3)    // 天井近く左
-        addFloor(x: 8, y: 22.5, w: 2.5) // 天井近く右
-        addFloor(x: 2, y: 23, w: 4.5)  // 最上段（ゴール台）
-        // 中段の中継足場
-        addFloor(x: 5.5, y: 15.5, w: 2.5)
-        // 溶岩（下半分）
-        addLava(x: 1, y: 1, w: 3)      // 左下大溶岩
-        addLava(x: 4, y: 1, w: 5)      // 中央下大溶岩
-        addLava(x: 10, y: 1, w: 1)     // 右端溶岩
-        // 溶岩の中の柱
-        addFloor(x: 3.5, y: 1, w: 0.5, h: 3, isTerrain: true)  // 柱①
-        addFloor(x: 9, y: 1, w: 0.5, h: 4, isTerrain: true)    // 柱②
-        // 天井スパイク
-        addSpike(col: 6, row: 24, direction: .down)
-        addSpike(col: 9.5, row: 24, direction: .down)
-        addSpike(col: 11, row: 24, direction: .down)
-        // ゴール
-        addGoal(col: 3.5, row: 23.5)
+        // 上部溶岩
+        addLava(x: 1, y: 18, w: 5, h: 6)
+        addLava(x: 7, y: 20, w: 4, h: 4)
+        addLava(x: 5, y: 14, w: 3, h: 4)
+        // 下半分の足場
+        addFloor(x: 1, y: 2, w: 3)
+        addFloor(x: 5, y: 4, w: 3)
+        addFloor(x: 9, y: 7, w: 2)
+        addFloor(x: 2, y: 10, w: 4)
+        addFloor(x: 8, y: 12, w: 3)
+        // 床スパイク
+        addSpike(col: 4, row: 1, direction: .up)
+        addSpike(col: 5, row: 1, direction: .up)
+        addSpike(col: 8, row: 1, direction: .up)
+        // 壁スパイク
+        addSpike(col: 1, row: 5, direction: .right)
+        addSpike(col: 11, row: 9, direction: .left)
+        addGoal(col: 8, row: 13)
         spawnPlayer()
     }
 
     // ─────────────────────────────────────────────
-    // STAGE 9: 消える床の嵐
+    // STAGE 9: 格子の迷宮
     // 難易度: ★★★★☆
-    // 概要: 消える床が6枚のジグザグ配置。下は溶岩。
-    //       踏んだ瞬間から時計が始まるので、素早く次の床へ移動せよ。
+    // 概要: 縦横の仕切り壁が格子状に迷路を形成。
+    //       どの隙間を通れるかを見極めてゴールへ。
     // ─────────────────────────────────────────────
     private func buildStage9() {
-        spawnPoint = gp(1, 2.5)
+        spawnPoint = gp(1, 2)
         addOuterWalls()
-        // スタート台（固定・左下）
-        addFloor(x: 1, y: 2.5, w: 3)
-        // 消える床6枚
-        addBlinkingFloor(x: 3.5, y: 5.5, w: 2.5)  // ①
-        addBlinkingFloor(x: 7, y: 8.5, w: 2.5)     // ②
-        addBlinkingFloor(x: 3, y: 11.5, w: 2.5)    // ③
-        addBlinkingFloor(x: 7, y: 15.5, w: 2.5)    // ④
-        addBlinkingFloor(x: 2.5, y: 19, w: 2.5)    // ⑤
-        addBlinkingFloor(x: 7, y: 22.5, w: 2.5)    // ⑥
-        // ゴール台（固定・右上）
-        addFloor(x: 8, y: 23.5, w: 2.5)
-        // 溶岩
-        addLava(x: 1, y: 1, w: 6.5)
-        addLava(x: 7, y: 1, w: 3.5)
+        // 縦壁
+        addFloor(x: 4, y: 1, w: 0.5, h: 9, isTerrain: true)
+        addFloor(x: 4, y: 13, w: 0.5, h: 11, isTerrain: true)
+        addFloor(x: 8, y: 5, w: 0.5, h: 10, isTerrain: true)
+        addFloor(x: 8, y: 18, w: 0.5, h: 6, isTerrain: true)
+        // 横壁
+        addFloor(x: 1, y: 10, w: 3, h: 0.5, isTerrain: true)
+        addFloor(x: 5, y: 15, w: 3, h: 0.5, isTerrain: true)
+        // 足場
+        addFloor(x: 1, y: 4, w: 2)
+        addFloor(x: 5, y: 7, w: 2)
+        addFloor(x: 1, y: 13, w: 2)
+        addFloor(x: 5, y: 19, w: 2)
+        addFloor(x: 9, y: 9, w: 2)
+        addFloor(x: 9, y: 21, w: 2)
         // スパイク
-        addSpike(col: 10.5, row: 1, direction: .up)
-        addSpike(col: 1.5, row: 24, direction: .down)
-        addSpike(col: 6, row: 24, direction: .down)
-        // ゴール
-        addGoal(col: 9, row: 24)
+        addSpike(col: 1, row: 10.5, direction: .up)
+        addSpike(col: 2, row: 10.5, direction: .up)
+        addSpike(col: 5, row: 15.5, direction: .up)
+        addSpike(col: 6, row: 15.5, direction: .up)
+        addSpike(col: 3, row: 24, direction: .down)
+        addSpike(col: 9, row: 24, direction: .down)
+        // 溶岩
+        addLava(x: 1, y: 1, w: 3)
+        addLava(x: 5, y: 1, w: 3)
+        addLava(x: 9, y: 1, w: 2)
+        addGoal(col: 9, row: 22)
         spawnPlayer()
     }
 
     // ─────────────────────────────────────────────
-    // STAGE 10: 四方スパイク回廊
+    // STAGE 10: 消える大地
     // 難易度: ★★★★☆
-    // 概要: 中央に縦仕切りで作られた回廊にスパイクが密集。
-    //       左右重力を駆使して狭い隙間を通り抜け、右上のゴールへ。
+    // 概要: 足場のほとんどが消える床。
+    //       立ち止まったら奈落へ。素早く動き続けろ。
     // ─────────────────────────────────────────────
     private func buildStage10() {
-        spawnPoint = gp(1.5, 2)
+        spawnPoint = gp(1, 2)
         addOuterWalls()
-        // 縦の仕切り壁（回廊を形成）
-        addFloor(x: 5, y: 1, w: 0.5, h: 10, isTerrain: true)    // 仕切り左下
-        addFloor(x: 7, y: 1, w: 0.5, h: 7, isTerrain: true)     // 仕切り右下
-        addFloor(x: 5, y: 15.5, w: 0.5, h: 10, isTerrain: true) // 仕切り左上
-        addFloor(x: 7, y: 12.5, w: 0.5, h: 12, isTerrain: true) // 仕切り右上
-        // 足場（左エリア）
-        addFloor(x: 1, y: 5.5, w: 2.5)    // 左中下段
-        addFloor(x: 1, y: 12.5, w: 2.5)   // 左中段
-        addFloor(x: 1, y: 19, w: 2.5)     // 左上段
-        // 足場（右エリア）
-        addFloor(x: 8, y: 8.5, w: 2.5)    // 右中段
-        addFloor(x: 8, y: 17, w: 2.5)     // 右上段（ゴール台）
-        // 回廊内の中継
-        addFloor(x: 5.5, y: 11.5, w: 2)
-        // スパイク
-        addSpike(col: 5, row: 10, direction: .up)
-        addSpike(col: 5, row: 14.5, direction: .down)
-        addSpike(col: 7.5, row: 7, direction: .up)
-        addSpike(col: 7.5, row: 11.5, direction: .down)
-        addSpike(col: 2.5, row: 1, direction: .up)
-        addSpike(col: 8.5, row: 1, direction: .up)
-        addSpike(col: 10.5, row: 1, direction: .up)
-        addSpike(col: 4.5, row: 24, direction: .down)
-        addSpike(col: 7.5, row: 24, direction: .down)
-        // 溶岩
-        addLava(x: 7, y: 1, w: 1.5)
-        // ゴール
-        addGoal(col: 9, row: 17.5)
+        addFloor(x: 1, y: 2, w: 2)
+        addFloor(x: 9, y: 22, w: 2)
+        // 消える床（ジグザグ）
+        addBlinkingFloor(x: 3, y: 4, w: 3)
+        addBlinkingFloor(x: 7, y: 6, w: 3)
+        addBlinkingFloor(x: 1, y: 8, w: 3)
+        addBlinkingFloor(x: 5, y: 10, w: 3)
+        addBlinkingFloor(x: 8, y: 12, w: 3)
+        addBlinkingFloor(x: 2, y: 14, w: 3)
+        addBlinkingFloor(x: 6, y: 16, w: 3)
+        addBlinkingFloor(x: 2, y: 18, w: 3)
+        addBlinkingFloor(x: 6, y: 20, w: 3)
+        addLava(x: 1, y: 1, w: 10)
+        addSpike(col: 4, row: 24, direction: .down)
+        addSpike(col: 7, row: 24, direction: .down)
+        addGoal(col: 9, row: 23)
         spawnPlayer()
     }
 
     // ─────────────────────────────────────────────
-    // STAGE 11: 孤島巡り
+    // STAGE 11: 横スパイク回廊
     // 難易度: ★★★☆☆
-    // 概要: 溶岩の海に浮かぶ6つの小島。
-    //       重力を切り替えながら島から島へホップして右上のゴールへ。
+    // 概要: 左右の壁からスパイクが突き出す。
+    //       上下に重力を切り替えながら安全なラインを探せ。
     // ─────────────────────────────────────────────
     private func buildStage11() {
-        spawnPoint = gp(1, 3.5)
+        spawnPoint = gp(4, 2)
         addOuterWalls()
-        // 島①〜⑥
-        addFloor(x: 1, y: 3, w: 2.5)      // 島① 左下（スタート）
-        addFloor(x: 5, y: 6, w: 2.5)      // 島② 中央下
-        addFloor(x: 8, y: 11, w: 2.5)     // 島③ 右中
-        addFloor(x: 4.5, y: 17, w: 2.5)   // 島④ 中央上
-        addFloor(x: 1, y: 22, w: 2.5)     // 島⑤ 左上
-        addFloor(x: 8, y: 20, w: 2.5)     // 島⑥ 右上（ゴール台）
-        // 溶岩
-        addLava(x: 1, y: 1, w: 4.5)       // 左底溶岩
-        addLava(x: 3, y: 1, w: 4.5)       // 中央底溶岩
-        addLava(x: 8, y: 1, w: 2.5)       // 右底溶岩
-        addLava(x: 1, y: 9, w: 7.5)       // 中央大溶岩
-        // 消える床
-        addBlinkingFloor(x: 3, y: 14, w: 1.5)
-        // スパイク
-        addSpike(col: 3.5, row: 3.5, direction: .up)   // 島①右端
-        addSpike(col: 7, row: 6.5, direction: .up)     // 島②右端
-        addSpike(col: 6.5, row: 24, direction: .down)
-        addSpike(col: 10, row: 24, direction: .down)
-        // ゴール
-        addGoal(col: 9, row: 20.5)
+        addFloor(x: 3, y: 2, w: 5)
+        addFloor(x: 1, y: 6, w: 2)
+        addFloor(x: 9, y: 9, w: 2)
+        addFloor(x: 1, y: 13, w: 2)
+        addFloor(x: 9, y: 16, w: 2)
+        addFloor(x: 3, y: 20, w: 5)
+        // 左壁スパイク
+        addSpike(col: 1, row: 4, direction: .right)
+        addSpike(col: 1, row: 8, direction: .right)
+        addSpike(col: 1, row: 11, direction: .right)
+        addSpike(col: 1, row: 17, direction: .right)
+        addSpike(col: 1, row: 21, direction: .right)
+        // 右壁スパイク
+        addSpike(col: 11, row: 5, direction: .left)
+        addSpike(col: 11, row: 10, direction: .left)
+        addSpike(col: 11, row: 14, direction: .left)
+        addSpike(col: 11, row: 18, direction: .left)
+        addSpike(col: 11, row: 22, direction: .left)
+        // 床スパイク
+        addSpike(col: 1, row: 1, direction: .up)
+        addSpike(col: 2, row: 1, direction: .up)
+        addSpike(col: 5, row: 1, direction: .up)
+        addSpike(col: 8, row: 1, direction: .up)
+        addSpike(col: 10, row: 1, direction: .up)
+        // 天井スパイク
+        addSpike(col: 3, row: 24, direction: .down)
+        addSpike(col: 7, row: 24, direction: .down)
+        addGoal(col: 5, row: 21)
         spawnPlayer()
     }
 
     // ─────────────────────────────────────────────
-    // STAGE 12: 上から下へ
+    // STAGE 12: 溶岩の通路
     // 難易度: ★★★★☆
-    // 概要: 左上スタートで、徐々に下に降りながらゴールを目指す。
-    //       天井にスパイクが密集しており上向き重力は極めて危険。
-    //       下向きに下りながら消える床も活用する。
+    // 概要: 巨大な溶岩ブロックが空間を分断する。
+    //       溶岩の間の細い隙間を縫って進め。
     // ─────────────────────────────────────────────
     private func buildStage12() {
-        spawnPoint = gp(1, 21.5)
+        spawnPoint = gp(1, 2)
         addOuterWalls()
-        // 天井スパイク（密集）
-        addSpike(col: 2.5, row: 24, direction: .down)
-        addSpike(col: 4, row: 24, direction: .down)
-        addSpike(col: 5.5, row: 24, direction: .down)
-        addSpike(col: 6.5, row: 24, direction: .down)
-        addSpike(col: 8, row: 24, direction: .down)
-        addSpike(col: 9.5, row: 24, direction: .down)
-        addSpike(col: 10.5, row: 24, direction: .down)
-        // 上段の足場（スタート台）
-        addFloor(x: 1, y: 22.5, w: 3)     // 左上スタート台
-        addFloor(x: 7, y: 21, w: 3.5)     // 右上足場
-        // 中段の足場
-        addFloor(x: 3, y: 17, w: 3.5)     // 中央左
-        addFloor(x: 7.5, y: 14, w: 3)     // 中央右
-        // 下段の足場
-        addFloor(x: 1, y: 10.5, w: 3)     // 左下
-        addFloor(x: 4.5, y: 7.5, w: 3.5)  // 中央下
-        addFloor(x: 8.5, y: 5, w: 2)      // 右下（ゴール台）
-        // 消える床
-        addBlinkingFloor(x: 4, y: 12.5, w: 3)
-        // 床スパイク
-        addSpike(col: 3.5, row: 1, direction: .up)
-        addSpike(col: 6, row: 1, direction: .up)
-        addSpike(col: 8.5, row: 1, direction: .up)
-        // 溶岩
-        addLava(x: 5, y: 1, w: 2.5)
-        // ゴール
-        addGoal(col: 9, row: 5.5)
+        addLava(x: 3, y: 4, w: 8, h: 4)
+        addLava(x: 1, y: 11, w: 6, h: 4)
+        addLava(x: 4, y: 18, w: 7, h: 4)
+        addLava(x: 3, y: 1, w: 8)
+        addFloor(x: 1, y: 2, w: 2)
+        addFloor(x: 1, y: 8, w: 1)
+        addFloor(x: 9, y: 8, w: 2)
+        addFloor(x: 8, y: 15, w: 3)
+        addFloor(x: 1, y: 19, w: 2)
+        addFloor(x: 1, y: 22, w: 3)
+        addSpike(col: 2, row: 4, direction: .up)
+        addSpike(col: 7, row: 8.5, direction: .up)
+        addSpike(col: 8, row: 8.5, direction: .up)
+        addSpike(col: 2, row: 24, direction: .down)
+        addSpike(col: 10, row: 24, direction: .down)
+        addGoal(col: 1, row: 23)
         spawnPlayer()
     }
 
     // ─────────────────────────────────────────────
-    // STAGE 13: 格子迷路
-    // 難易度: ★★★★☆
-    // 概要: 縦横の仕切り壁が格子状に配置されたステージ。
-    //       各区画の隙間（仕切りの端の開口部）を見つけて右上のゴールへ。
+    // STAGE 13: 四方スパイク
+    // 難易度: ★★★★★
+    // 概要: 上下左右すべての方向からスパイクが密集。
+    //       中央の安全な島だけを足場に、ゴールを目指せ。
     // ─────────────────────────────────────────────
     private func buildStage13() {
-        spawnPoint = gp(1, 2.5)
+        spawnPoint = gp(4, 11)
         addOuterWalls()
-        // 縦仕切り（2本）
-        addFloor(x: 4, y: 1, w: 0.5, h: 8, isTerrain: true)     // 縦①下半
-        addFloor(x: 4, y: 12.5, w: 0.5, h: 12, isTerrain: true) // 縦①上半
-        addFloor(x: 7.5, y: 6, w: 0.5, h: 10, isTerrain: true)  // 縦②中
-        addFloor(x: 7.5, y: 21, w: 0.5, h: 4, isTerrain: true)  // 縦②上
-        // 横仕切り（2本）
-        addFloor(x: 4, y: 10.5, w: 3.5, h: 0.5, isTerrain: true)  // 横①
-        addFloor(x: 4, y: 18, w: 3.5, h: 0.5, isTerrain: true)    // 横②
-        // 足場
-        addFloor(x: 1, y: 6, w: 1.5)       // 左下段
-        addFloor(x: 1, y: 15.5, w: 1.5)    // 左中段
-        addFloor(x: 4.5, y: 14.5, w: 2.5)  // 中央足場
-        addFloor(x: 8, y: 10.5, w: 2.5)    // 右中下段
-        addFloor(x: 8, y: 17.5, w: 2.5)    // 右中上段（ゴール台）
-        // スパイク
-        addSpike(col: 5.5, row: 1, direction: .up)
-        addSpike(col: 9.5, row: 1, direction: .up)
-        addSpike(col: 5.5, row: 24, direction: .down)
-        addSpike(col: 9.5, row: 24, direction: .down)
-        addSpike(col: 5.5, row: 11, direction: .up)
-        // 溶岩
-        addLava(x: 1, y: 1, w: 1.5)
-        // ゴール
-        addGoal(col: 9, row: 18)
+        // 床スパイク（全面）
+        addSpike(col: 1, row: 1, direction: .up)
+        addSpike(col: 2, row: 1, direction: .up)
+        addSpike(col: 3, row: 1, direction: .up)
+        addSpike(col: 4, row: 1, direction: .up)
+        addSpike(col: 6, row: 1, direction: .up)
+        addSpike(col: 7, row: 1, direction: .up)
+        addSpike(col: 8, row: 1, direction: .up)
+        addSpike(col: 9, row: 1, direction: .up)
+        addSpike(col: 10, row: 1, direction: .up)
+        // 天井スパイク（全面）
+        addSpike(col: 1, row: 24, direction: .down)
+        addSpike(col: 2, row: 24, direction: .down)
+        addSpike(col: 4, row: 24, direction: .down)
+        addSpike(col: 5, row: 24, direction: .down)
+        addSpike(col: 7, row: 24, direction: .down)
+        addSpike(col: 8, row: 24, direction: .down)
+        addSpike(col: 9, row: 24, direction: .down)
+        addSpike(col: 10, row: 24, direction: .down)
+        // 左壁スパイク
+        addSpike(col: 1, row: 2, direction: .right)
+        addSpike(col: 1, row: 5, direction: .right)
+        addSpike(col: 1, row: 8, direction: .right)
+        addSpike(col: 1, row: 14, direction: .right)
+        addSpike(col: 1, row: 17, direction: .right)
+        addSpike(col: 1, row: 20, direction: .right)
+        // 右壁スパイク
+        addSpike(col: 11, row: 3, direction: .left)
+        addSpike(col: 11, row: 6, direction: .left)
+        addSpike(col: 11, row: 10, direction: .left)
+        addSpike(col: 11, row: 13, direction: .left)
+        addSpike(col: 11, row: 16, direction: .left)
+        addSpike(col: 11, row: 21, direction: .left)
+        // 安全な島
+        addFloor(x: 3, y: 11, w: 5)
+        addFloor(x: 1, y: 11, w: 2)
+        addFloor(x: 9, y: 11, w: 2)
+        addFloor(x: 3, y: 19, w: 5)
+        addFloor(x: 3, y: 4, w: 5)
+        addGoal(col: 5, row: 20)
         spawnPlayer()
     }
 
     // ─────────────────────────────────────────────
-    // STAGE 14: 全ギミック総動員
-    // 難易度: ★★★★★
-    // 概要: 全種類のギミックが高密度で出現する最終試練（前半）。
-    //       左上からスタートし、ジグザグに下りながら右下のゴールへ。
-    //       消える床を踏んだら即座に次の行動を判断すること。
+    // STAGE 14: 溶岩サンドイッチ
+    // 難易度: ★★★☆☆
+    // 概要: 上にも下にも溶岩が広がる。
+    //       中間の細い安全地帯を横断してゴールへ。
     // ─────────────────────────────────────────────
     private func buildStage14() {
-        spawnPoint = gp(1, 22.5)
+        spawnPoint = gp(1, 11)
         addOuterWalls()
-        // スタート台（左上）
-        addFloor(x: 1, y: 23, w: 2.5)
-        // 通常足場
-        addFloor(x: 3.5, y: 20, w: 2.5)   // 足場②
-        addFloor(x: 7, y: 17.5, w: 2.5)   // 足場③
-        addFloor(x: 3.5, y: 14, w: 2.5)   // 足場④
-        // 消える床ゾーン
-        addBlinkingFloor(x: 7, y: 11, w: 2.5)   // 消①
-        addBlinkingFloor(x: 3, y: 8.5, w: 2.5)  // 消②
-        addBlinkingFloor(x: 7, y: 5.5, w: 2.5)  // 消③
-        // ゴール台（右下）
-        addFloor(x: 8, y: 2.5, w: 2.5)
-        // 天井スパイク
-        addSpike(col: 4, row: 24, direction: .down)
-        addSpike(col: 6, row: 24, direction: .down)
-        addSpike(col: 8, row: 24, direction: .down)
-        addSpike(col: 10, row: 24, direction: .down)
-        // 床スパイク
-        addSpike(col: 2, row: 1, direction: .up)
-        addSpike(col: 4.5, row: 1, direction: .up)
-        addSpike(col: 7.5, row: 1, direction: .up)
-        addSpike(col: 10, row: 1, direction: .up)
-        // 溶岩
-        addLava(x: 1, y: 1, w: 2)
-        addLava(x: 5.5, y: 1, w: 2)
-        addLava(x: 8.5, y: 1, w: 2)
-        // 追加スパイク
-        addSpike(col: 6, row: 20.5, direction: .up)   // 足場②右端
-        addSpike(col: 9, row: 18, direction: .up)      // 足場③右端
-        // ゴール
-        addGoal(col: 9, row: 3)
+        addLava(x: 1, y: 1, w: 10, h: 6)
+        addLava(x: 1, y: 18, w: 10, h: 6)
+        addFloor(x: 1, y: 11, w: 2)
+        addFloor(x: 4, y: 9, w: 2)
+        addFloor(x: 7, y: 11, w: 2)
+        addFloor(x: 4, y: 13, w: 2)
+        addFloor(x: 9, y: 10, w: 2)
+        // 通路を絞る縦壁
+        addFloor(x: 3, y: 7, w: 0.5, h: 4, isTerrain: true)
+        addFloor(x: 3, y: 14, w: 0.5, h: 4, isTerrain: true)
+        addFloor(x: 6, y: 7, w: 0.5, h: 4, isTerrain: true)
+        addFloor(x: 6, y: 14, w: 0.5, h: 4, isTerrain: true)
+        addSpike(col: 3, row: 7, direction: .up)
+        addSpike(col: 6, row: 7, direction: .up)
+        addSpike(col: 3, row: 17, direction: .down)
+        addSpike(col: 6, row: 17, direction: .down)
+        addGoal(col: 9, row: 11)
         spawnPlayer()
     }
 
     // ─────────────────────────────────────────────
-    // STAGE 15: 禁断のステージ
-    // 難易度: ★★★★★
-    // 概要: 全ギミック最高密度の最終面。
-    //       中央仕切りで左右に分断され、消える床・溶岩・密集スパイクが全方位から襲う。
-    //       4方向の重力を完全に使いこなして突破せよ。
+    // STAGE 15: 縦断回廊
+    // 難易度: ★★★★☆
+    // 概要: 3本の縦壁が画面を分断する複数回廊。
+    //       各回廊の隙間を見つけ、重力を駆使して突破せよ。
     // ─────────────────────────────────────────────
     private func buildStage15() {
-        spawnPoint = gp(1, 2.5)
+        spawnPoint = gp(1, 2)
         addOuterWalls()
-        // 中央仕切り（上下に隙間あり）
-        addFloor(x: 5.5, y: 1, w: 0.5, h: 8.5, isTerrain: true)     // 仕切り下部
-        addFloor(x: 5.5, y: 14.5, w: 0.5, h: 10, isTerrain: true)   // 仕切り上部
-        // 左エリアの足場
-        addFloor(x: 1, y: 6, w: 2.5)      // 左中下
-        addFloor(x: 3, y: 9.5, w: 2.5)    // 左中
-        addFloor(x: 1, y: 14.5, w: 2)     // 左中上
-        addFloor(x: 3, y: 18, w: 2.5)     // 左上
-        // 右エリアの足場
-        addFloor(x: 7, y: 5, w: 2)        // 右下
-        addFloor(x: 9, y: 9, w: 1.5)      // 右中下
-        addFloor(x: 7, y: 13.5, w: 2)     // 右中
-        addFloor(x: 9, y: 18, w: 1.5)     // 右上（ゴール台）
-        // 消える床
-        addBlinkingFloor(x: 2.5, y: 12.5, w: 2.5)   // 左の消える床
-        addBlinkingFloor(x: 6, y: 10.5, w: 1)        // 仕切り隙間の消える床
-        addBlinkingFloor(x: 7, y: 22.5, w: 3.5)      // 右上の消える床
-        // 天井スパイク（6本）
+        addFloor(x: 3, y: 5, w: 0.5, h: 19, isTerrain: true)
+        addFloor(x: 6, y: 1, w: 0.5, h: 16, isTerrain: true)
+        addFloor(x: 9, y: 8, w: 0.5, h: 16, isTerrain: true)
+        addFloor(x: 1, y: 2, w: 2)
+        addFloor(x: 1, y: 10, w: 2)
+        addFloor(x: 4, y: 3, w: 2)
+        addFloor(x: 4, y: 19, w: 2)
+        addFloor(x: 7, y: 19, w: 2)
+        addFloor(x: 7, y: 5, w: 2)
+        addFloor(x: 10, y: 4, w: 1)
+        addFloor(x: 10, y: 22, w: 1)
+        addSpike(col: 1, row: 1, direction: .up)
+        addSpike(col: 2, row: 1, direction: .up)
+        addSpike(col: 5, row: 1, direction: .up)
+        addSpike(col: 7, row: 1, direction: .up)
+        addSpike(col: 8, row: 1, direction: .up)
+        addSpike(col: 4, row: 24, direction: .down)
+        addSpike(col: 7, row: 24, direction: .down)
+        addSpike(col: 10, row: 24, direction: .down)
+        addLava(x: 1, y: 1, w: 2)
+        addGoal(col: 10, row: 23)
+        spawnPlayer()
+    }
+
+    // ─────────────────────────────────────────────
+    // STAGE 16: 孤島めぐり
+    // 難易度: ★★★★☆
+    // 概要: 溶岩の海に浮かぶ小さな島々。
+    //       重力を切り替えながら島から島へ大ジャンプ。
+    // ─────────────────────────────────────────────
+    private func buildStage16() {
+        spawnPoint = gp(1, 3)
+        addOuterWalls()
+        addLava(x: 1, y: 1, w: 10, h: 2)
+        addLava(x: 1, y: 7, w: 5, h: 2)
+        addLava(x: 7, y: 10, w: 4, h: 2)
+        addLava(x: 1, y: 14, w: 4, h: 2)
+        addLava(x: 6, y: 17, w: 5, h: 2)
+        addLava(x: 2, y: 21, w: 8, h: 2)
+        addFloor(x: 1, y: 3, w: 2)
+        addFloor(x: 5, y: 5, w: 2)
+        addFloor(x: 9, y: 3, w: 2)
+        addFloor(x: 7, y: 8, w: 2)
+        addFloor(x: 2, y: 9, w: 2)
+        addFloor(x: 6, y: 12, w: 2)
+        addFloor(x: 1, y: 16, w: 2)
+        addFloor(x: 5, y: 16, w: 1)
+        addFloor(x: 9, y: 19, w: 2)
+        addSpike(col: 3, row: 3.5, direction: .up)
+        addSpike(col: 4, row: 5.5, direction: .up)
+        addSpike(col: 8, row: 8.5, direction: .up)
+        addSpike(col: 3, row: 24, direction: .down)
+        addSpike(col: 8, row: 24, direction: .down)
+        addGoal(col: 9, row: 20)
+        spawnPlayer()
+    }
+
+    // ─────────────────────────────────────────────
+    // STAGE 17: 純粋パズル（スパイクも溶岩もなし）
+    // 難易度: ★★★☆☆
+    // 概要: ハザードなし。ただし消える床だらけ。
+    //       重力と消える床だけで解くシンプルパズル。
+    // ─────────────────────────────────────────────
+    private func buildStage17() {
+        spawnPoint = gp(1, 2)
+        addOuterWalls()
+        addFloor(x: 1, y: 2, w: 2)
+        addFloor(x: 9, y: 5, w: 2)
+        addFloor(x: 1, y: 9, w: 2)
+        addFloor(x: 9, y: 13, w: 2)
+        addFloor(x: 1, y: 18, w: 2)
+        addFloor(x: 9, y: 22, w: 2)
+        // 消える橋
+        addBlinkingFloor(x: 3, y: 3, w: 4)
+        addBlinkingFloor(x: 3, y: 7, w: 4)
+        addBlinkingFloor(x: 3, y: 11, w: 4)
+        addBlinkingFloor(x: 3, y: 15, w: 4)
+        addBlinkingFloor(x: 3, y: 20, w: 4)
+        // 縦仕切り（橋の途中を妨害）
+        addFloor(x: 5, y: 1, w: 0.5, h: 2, isTerrain: true)
+        addFloor(x: 5, y: 4, w: 0.5, h: 2, isTerrain: true)
+        addFloor(x: 5, y: 8, w: 0.5, h: 2, isTerrain: true)
+        addFloor(x: 5, y: 12, w: 0.5, h: 2, isTerrain: true)
+        addFloor(x: 5, y: 16, w: 0.5, h: 2, isTerrain: true)
+        addFloor(x: 5, y: 21, w: 0.5, h: 2, isTerrain: true)
+        addGoal(col: 9, row: 23)
+        spawnPlayer()
+    }
+
+    // ─────────────────────────────────────────────
+    // STAGE 18: 天地逆転
+    // 難易度: ★★★★☆
+    // 概要: 上段スタート・下段ゴール。落下が基本だが
+    //       随所に逆重力必須の仕掛けが待ち構える。
+    // ─────────────────────────────────────────────
+    private func buildStage18() {
+        spawnPoint = gp(1, 22)
+        addOuterWalls()
+        addFloor(x: 1, y: 22, w: 3)
         addSpike(col: 2, row: 24, direction: .down)
-        addSpike(col: 3.5, row: 24, direction: .down)
+        addSpike(col: 3, row: 24, direction: .down)
+        addSpike(col: 6, row: 24, direction: .down)
+        addSpike(col: 7, row: 24, direction: .down)
+        addSpike(col: 9, row: 24, direction: .down)
+        addSpike(col: 10, row: 24, direction: .down)
+        addFloor(x: 5, y: 18, w: 3)
+        addFloor(x: 9, y: 15, w: 2)
+        addFloor(x: 2, y: 13, w: 3)
+        addBlinkingFloor(x: 6, y: 10, w: 3)
+        addFloor(x: 1, y: 8, w: 4)
+        addFloor(x: 7, y: 6, w: 4)
+        addFloor(x: 2, y: 3, w: 3)
+        addSpike(col: 5, row: 1, direction: .up)
+        addSpike(col: 6, row: 1, direction: .up)
+        addSpike(col: 7, row: 1, direction: .up)
+        addSpike(col: 10, row: 1, direction: .up)
+        addSpike(col: 11, row: 17, direction: .left)
+        addSpike(col: 1, row: 11, direction: .right)
+        addLava(x: 5, y: 1, w: 3)
+        addGoal(col: 2, row: 4)
+        spawnPlayer()
+    }
+
+    // ─────────────────────────────────────────────
+    // STAGE 19: 複合ギミック迷宮
+    // 難易度: ★★★★★
+    // 概要: 縦壁・溶岩・スパイク・消える床が高密度に絡み合う。
+    //       正確な重力制御と素早い判断が必要。
+    // ─────────────────────────────────────────────
+    private func buildStage19() {
+        spawnPoint = gp(1, 2)
+        addOuterWalls()
+        addFloor(x: 4, y: 1, w: 0.5, h: 12, isTerrain: true)
+        addFloor(x: 4, y: 16, w: 0.5, h: 8, isTerrain: true)
+        addFloor(x: 8, y: 8, w: 0.5, h: 16, isTerrain: true)
+        addLava(x: 1, y: 1, w: 3)
+        addLava(x: 5, y: 12, w: 3, h: 3)
+        addLava(x: 9, y: 1, w: 2, h: 7)
+        addLava(x: 5, y: 20, w: 3, h: 4)
+        addFloor(x: 1, y: 5, w: 3)
+        addFloor(x: 5, y: 3, w: 3)
+        addFloor(x: 5, y: 8, w: 3)
+        addFloor(x: 1, y: 14, w: 3)
+        addFloor(x: 1, y: 19, w: 3)
+        addFloor(x: 9, y: 16, w: 2)
+        addBlinkingFloor(x: 5, y: 16, w: 3)
+        addBlinkingFloor(x: 1, y: 10, w: 3)
+        addSpike(col: 3, row: 24, direction: .down)
+        addSpike(col: 6, row: 24, direction: .down)
+        addSpike(col: 10, row: 24, direction: .down)
+        addSpike(col: 1, row: 7, direction: .right)
+        addSpike(col: 11, row: 12, direction: .left)
+        addSpike(col: 5, row: 5.5, direction: .up)
+        addSpike(col: 6, row: 5.5, direction: .up)
+        addGoal(col: 9, row: 17)
+        spawnPlayer()
+    }
+
+    // ─────────────────────────────────────────────
+    // STAGE 20: 最終決戦
+    // 難易度: ★★★★★
+    // 概要: 全ギミック最高密度。溶岩・スパイク・消える床が
+    //       渾然一体となった究極の最終面。諦めずに挑め。
+    // ─────────────────────────────────────────────
+    private func buildStage20() {
+        spawnPoint = gp(1, 12)
+        addOuterWalls()
+        addLava(x: 1, y: 1, w: 4, h: 3)
+        addLava(x: 6, y: 1, w: 5, h: 3)
+        addLava(x: 1, y: 19, w: 5, h: 4)
+        addLava(x: 7, y: 21, w: 4, h: 3)
+        addLava(x: 5, y: 9, w: 3, h: 3)
+        addLava(x: 5, y: 15, w: 3, h: 3)
+        addFloor(x: 4, y: 4, w: 0.5, h: 5, isTerrain: true)
+        addFloor(x: 4, y: 14, w: 0.5, h: 5, isTerrain: true)
+        addFloor(x: 1, y: 12, w: 3)
+        addFloor(x: 5, y: 5, w: 3)
+        addFloor(x: 1, y: 7, w: 3)
+        addFloor(x: 9, y: 5, w: 2)
+        addFloor(x: 9, y: 12, w: 2)
+        addFloor(x: 1, y: 17, w: 3)
+        addFloor(x: 9, y: 17, w: 2)
+        addBlinkingFloor(x: 5, y: 12, w: 2)
+        addBlinkingFloor(x: 1, y: 4, w: 3)
+        addSpike(col: 1, row: 1, direction: .up)
+        addSpike(col: 2, row: 1, direction: .up)
+        addSpike(col: 3, row: 1, direction: .up)
+        addSpike(col: 5, row: 1, direction: .up)
+        addSpike(col: 2, row: 24, direction: .down)
         addSpike(col: 5, row: 24, direction: .down)
-        addSpike(col: 6.5, row: 24, direction: .down)
         addSpike(col: 8, row: 24, direction: .down)
         addSpike(col: 10, row: 24, direction: .down)
-        // 床スパイク
-        addSpike(col: 2.5, row: 1, direction: .up)
-        addSpike(col: 6, row: 1, direction: .up)
-        addSpike(col: 9, row: 1, direction: .up)
-        addSpike(col: 10.5, row: 1, direction: .up)
-        // 溶岩
-        addLava(x: 1, y: 1, w: 2.5)
-        addLava(x: 5.5, y: 1, w: 3)
-        addLava(x: 3, y: 22, w: 2.5)
-        // 追加スパイク
-        addSpike(col: 5, row: 10, direction: .up)
-        addSpike(col: 10, row: 9.5, direction: .up)
-        // ゴール
-        addGoal(col: 9.5, row: 18.5)
+        addSpike(col: 1, row: 14, direction: .right)
+        addSpike(col: 11, row: 8, direction: .left)
+        addSpike(col: 11, row: 19, direction: .left)
+        addGoal(col: 9, row: 18)
         spawnPlayer()
     }
 
