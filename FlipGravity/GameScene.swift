@@ -117,6 +117,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if theme.hasGrid { addBackgroundGrid() }
         if theme.hasStars { addBackgroundStars() }
         buildStage()
+        addPlayAreaBorder()
         setupHUD()
         if UserDefaults.standard.bool(forKey: "debugMode") { addDebugGrid() }
     }
@@ -254,6 +255,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         body.contactTestBitMask = PhysicsCategory.none
         node.physicsBody = body
         addChild(node)
+    }
+
+    /// プレイエリアの枠線（x=30〜360, y=30〜750）
+    private func addPlayAreaBorder() {
+        let playRect = CGRect(x: C, y: C, width: 11 * C, height: 24 * C)
+        let border = SKShapeNode(rect: playRect)
+        border.fillColor = .clear
+        border.strokeColor = UIColor(white: 1.0, alpha: 0.25)
+        border.lineWidth = 1.5
+        border.zPosition = 6
+        addChild(border)
     }
 
     // ─────────────────────────────────────────────
