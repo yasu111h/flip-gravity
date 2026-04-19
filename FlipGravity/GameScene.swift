@@ -66,6 +66,12 @@ struct PhysicsCategory {
     static let goal:   UInt32 = 0x8
 }
 
+// MARK: - Spike Direction
+
+enum SpikeDirection {
+    case up, down, left, right
+}
+
 // MARK: - GameScene
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
@@ -107,6 +113,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if theme.hasStars { addBackgroundStars() }
         buildStage()
         setupHUD()
+        if UserDefaults.standard.bool(forKey: "debugMode") { addDebugGrid() }
     }
 
     private func addBackgroundGrid() {
@@ -206,10 +213,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //    CGRect(x: 左端X, y: 下端Y, width: 横幅, height: 縦幅)
     //    ブロックの左下コーナーからの大きさで指定する
     //
-    //  addSpike の at: / pointingUp:
-    //    at: スパイクの「根本」の位置
-    //    pointingUp: true  → 上向き三角（床の上に置く。下から来た球に刺さる）
-    //    pointingUp: false → 下向き三角（天井に付ける。上から来た球に刺さる）
+    //  addSpike の at: / direction:
+    //    at: スパイクの「底辺の中心」位置（先端ではなく平らな端の中心）
+    //    direction: .up    → 上向き三角（床の上に置く）
+    //    direction: .down  → 下向き三角（天井に付ける）
+    //    direction: .right → 右向き三角（左壁に付ける）
+    //    direction: .left  → 左向き三角（右壁に付ける）
     //
     //  addGoal の at:
     //    ゴール円の中心座標
@@ -238,10 +247,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addFloor(rect: CGRect(x: w * 0.3,  y: h * 0.82,  width: w * 0.25, height: 18), isTerrain: false) // ゴール手前の足場
 
         // ── スパイク（床の上向き）──
-        addSpike(at: CGPoint(x: w * 0.1, y: 30), pointingUp: true)  // 床左のスパイク①
-        addSpike(at: CGPoint(x: w * 0.15, y: 30), pointingUp: true)  // 床左のスパイク②
-        addSpike(at: CGPoint(x: w * 0.68, y: h * 0.35 + 18), pointingUp: true)  // 中段足場の右端スパイク
-        addSpike(at: CGPoint(x: w * 0.8,  y: h - 20), pointingUp: false)         // 天井の下向きスパイク
+        addSpike(at: CGPoint(x: w * 0.1, y: 30), direction: .up)  // 床左のスパイク①
+        addSpike(at: CGPoint(x: w * 0.15, y: 30), direction: .up)  // 床左のスパイク②
+        addSpike(at: CGPoint(x: w * 0.68, y: h * 0.35 + 18), direction: .up)  // 中段足場の右端スパイク
+        addSpike(at: CGPoint(x: w * 0.8,  y: h - 20), direction: .down)         // 天井の下向きスパイク
 
         // ── 溶岩 ──
         addLava(rect: CGRect(x: w * 0.35,  y: 30, width: w * 0.4, height: 18)) // 床中央の溶岩プール
@@ -282,11 +291,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addFloor(rect: CGRect(x: w * 0.6, y: h * 0.6,  width: w * 0.2, height: 16), isTerrain: false) // 右上段（ゴール台）
 
         // ── スパイク ──
-        addSpike(at: CGPoint(x: w * 0.2,  y: 30),       pointingUp: true)  // 左エリア床スパイク
-        addSpike(at: CGPoint(x: w * 0.2,  y: h - 20),   pointingUp: false) // 左エリア天井スパイク
-        addSpike(at: CGPoint(x: w * 0.7,  y: 30),       pointingUp: true)  // 右エリア床スパイク
-        addSpike(at: CGPoint(x: w * 0.7,  y: h * 0.45), pointingUp: false) // 右中段足場の上スパイク
-        addSpike(at: CGPoint(x: w * 0.85, y: 30),       pointingUp: true)  // 右壁際スパイク
+        addSpike(at: CGPoint(x: w * 0.2,  y: 30),       direction: .up)  // 左エリア床スパイク
+        addSpike(at: CGPoint(x: w * 0.2,  y: h - 20),   direction: .down) // 左エリア天井スパイク
+        addSpike(at: CGPoint(x: w * 0.7,  y: 30),       direction: .up)  // 右エリア床スパイク
+        addSpike(at: CGPoint(x: w * 0.7,  y: h * 0.45), direction: .down) // 右中段足場の上スパイク
+        addSpike(at: CGPoint(x: w * 0.85, y: 30),       direction: .up)  // 右壁際スパイク
 
         // ── 溶岩（左エリア中段に横長の溶岩）──
         addLava(rect: CGRect(x: 20, y: h * 0.42, width: w * 0.2, height: 16))
@@ -326,9 +335,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addFloor(rect: CGRect(x: w * 0.67, y: h * 0.4,  width: w * 0.06, height: 14), isTerrain: false) // 中段右の中継
 
         // ── 天井スパイク（上向き重力時の脅威）──
-        addSpike(at: CGPoint(x: w * 0.5,  y: h - 20), pointingUp: false) // 天井中央スパイク
-        addSpike(at: CGPoint(x: w * 0.25, y: h - 20), pointingUp: false) // 天井左スパイク
-        addSpike(at: CGPoint(x: w * 0.75, y: h - 20), pointingUp: false) // 天井右スパイク
+        addSpike(at: CGPoint(x: w * 0.5,  y: h - 20), direction: .down) // 天井中央スパイク
+        addSpike(at: CGPoint(x: w * 0.25, y: h - 20), direction: .down) // 天井左スパイク
+        addSpike(at: CGPoint(x: w * 0.75, y: h - 20), direction: .down) // 天井右スパイク
 
         // ── ゴール（右中段足場の上）──
         addGoal(at: CGPoint(x: w * 0.7, y: h * 0.55 + 16 + 22))
@@ -362,9 +371,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addBlinkingFloor(rect: CGRect(x: w * 0.55, y: h * 0.72, width: w * 0.18, height: 14)) // ④ 右上の消える床
 
         // ── スパイク（床と右エリアへの罰）──
-        addSpike(at: CGPoint(x: w * 0.45, y: 30), pointingUp: true) // 床中央スパイク①
-        addSpike(at: CGPoint(x: w * 0.6,  y: 30), pointingUp: true) // 床中央スパイク②
-        addSpike(at: CGPoint(x: w * 0.75, y: 30), pointingUp: true) // 床右スパイク③
+        addSpike(at: CGPoint(x: w * 0.45, y: 30), direction: .up) // 床中央スパイク①
+        addSpike(at: CGPoint(x: w * 0.6,  y: 30), direction: .up) // 床中央スパイク②
+        addSpike(at: CGPoint(x: w * 0.75, y: 30), direction: .up) // 床右スパイク③
 
         // ── 溶岩（床の一部）──
         addLava(rect: CGRect(x: w * 0.2, y: 30, width: w * 0.22, height: 16))
@@ -407,12 +416,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addBlinkingFloor(rect: CGRect(x: w * 0.55, y: h * 0.55, width: w * 0.18, height: 14)) // 右側の消える床
 
         // ── スパイク（四隅と中央）──
-        addSpike(at: CGPoint(x: w * 0.3,  y: 30),       pointingUp: true)  // 床左スパイク
-        addSpike(at: CGPoint(x: w * 0.7,  y: 30),       pointingUp: true)  // 床右スパイク
-        addSpike(at: CGPoint(x: w * 0.3,  y: h - 20),   pointingUp: false) // 天井左スパイク
-        addSpike(at: CGPoint(x: w * 0.7,  y: h - 20),   pointingUp: false) // 天井右スパイク
-        addSpike(at: CGPoint(x: 20,       y: h * 0.5),  pointingUp: true)  // 左壁中段スパイク（横向き危険ゾーン）
-        addSpike(at: CGPoint(x: w - 20,   y: h * 0.5),  pointingUp: false) // 右壁中段スパイク
+        addSpike(at: CGPoint(x: w * 0.3,  y: 30),       direction: .up)  // 床左スパイク
+        addSpike(at: CGPoint(x: w * 0.7,  y: 30),       direction: .up)  // 床右スパイク
+        addSpike(at: CGPoint(x: w * 0.3,  y: h - 20),   direction: .down) // 天井左スパイク
+        addSpike(at: CGPoint(x: w * 0.7,  y: h - 20),   direction: .down) // 天井右スパイク
+        addSpike(at: CGPoint(x: 20,       y: h * 0.5),  direction: .right) // 左壁中段スパイク（右向き）
+        addSpike(at: CGPoint(x: w - 20,   y: h * 0.5),  direction: .left)  // 右壁中段スパイク（左向き）
 
         // ── 溶岩（床の両端）──
         addLava(rect: CGRect(x: 20,       y: 30, width: w * 0.22, height: 14)) // 左端の溶岩
@@ -452,11 +461,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addBlinkingFloor(rect: CGRect(x: w * 0.38, y: h * 0.33, width: w * 0.2, height: 14))
 
         // ── スパイク ──
-        addSpike(at: CGPoint(x: w * 0.35, y: 30),             pointingUp: true)  // 床中央スパイク①
-        addSpike(at: CGPoint(x: w * 0.5,  y: 30),             pointingUp: true)  // 床中央スパイク②
-        addSpike(at: CGPoint(x: w * 0.65, y: 30),             pointingUp: true)  // 床右スパイク
-        addSpike(at: CGPoint(x: w * 0.85, y: h * 0.58 + 16), pointingUp: true)  // 橋の右端スパイク
-        addSpike(at: CGPoint(x: w * 0.15, y: h - 20),         pointingUp: false) // 天井左スパイク
+        addSpike(at: CGPoint(x: w * 0.35, y: 30),             direction: .up)  // 床中央スパイク①
+        addSpike(at: CGPoint(x: w * 0.5,  y: 30),             direction: .up)  // 床中央スパイク②
+        addSpike(at: CGPoint(x: w * 0.65, y: 30),             direction: .up)  // 床右スパイク
+        addSpike(at: CGPoint(x: w * 0.85, y: h * 0.58 + 16), direction: .up)  // 橋の右端スパイク
+        addSpike(at: CGPoint(x: w * 0.15, y: h - 20),         direction: .down) // 天井左スパイク
 
         // ── 溶岩 ──
         addLava(rect: CGRect(x: w * 0.3,  y: 30, width: w * 0.08, height: 18)) // 左スパイク間の溶岩
@@ -489,12 +498,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addFloor(rect: CGRect(x: w * 0.5, y: h * 0.82, width: w * 0.3,  height: 16), isTerrain: false) // Z6: 右上（ゴール台）
 
         // ── スパイク（ジグザグの隙間に配置）──
-        addSpike(at: CGPoint(x: w * 0.2,  y: 30),             pointingUp: true)  // 床スパイク①
-        addSpike(at: CGPoint(x: w * 0.7,  y: 30),             pointingUp: true)  // 床スパイク②
-        addSpike(at: CGPoint(x: w * 0.4,  y: h * 0.15 + 16), pointingUp: true)  // Z1右端スパイク
-        addSpike(at: CGPoint(x: w * 0.85, y: h * 0.28 + 16), pointingUp: true)  // Z2右端スパイク
-        addSpike(at: CGPoint(x: w * 0.4,  y: h * 0.42 + 16), pointingUp: true)  // Z3右端スパイク
-        addSpike(at: CGPoint(x: w * 0.15, y: h - 20),         pointingUp: false) // 天井スパイク
+        addSpike(at: CGPoint(x: w * 0.2,  y: 30),             direction: .up)  // 床スパイク①
+        addSpike(at: CGPoint(x: w * 0.7,  y: 30),             direction: .up)  // 床スパイク②
+        addSpike(at: CGPoint(x: w * 0.4,  y: h * 0.15 + 16), direction: .up)  // Z1右端スパイク
+        addSpike(at: CGPoint(x: w * 0.85, y: h * 0.28 + 16), direction: .up)  // Z2右端スパイク
+        addSpike(at: CGPoint(x: w * 0.4,  y: h * 0.42 + 16), direction: .up)  // Z3右端スパイク
+        addSpike(at: CGPoint(x: w * 0.15, y: h - 20),         direction: .down) // 天井スパイク
 
         // ── 溶岩（床の中央部）──
         addLava(rect: CGRect(x: w * 0.35, y: 30, width: w * 0.14, height: 16))
@@ -539,9 +548,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addFloor(rect: CGRect(x: w * 0.7,  y: 30, width: w * 0.05, height: h * 0.15), isTerrain: true) // 柱②
 
         // ── 天井スパイク（上向き重力時の脅威）──
-        addSpike(at: CGPoint(x: w * 0.5,  y: h - 20), pointingUp: false) // 天井中央
-        addSpike(at: CGPoint(x: w * 0.75, y: h - 20), pointingUp: false) // 天井右
-        addSpike(at: CGPoint(x: w * 0.88, y: h - 20), pointingUp: false) // 天井右端
+        addSpike(at: CGPoint(x: w * 0.5,  y: h - 20), direction: .down) // 天井中央
+        addSpike(at: CGPoint(x: w * 0.75, y: h - 20), direction: .down) // 天井右
+        addSpike(at: CGPoint(x: w * 0.88, y: h - 20), direction: .down) // 天井右端
 
         // ── ゴール（最上段の上）──
         addGoal(at: CGPoint(x: w * 0.3, y: h * 0.88 + 16 + 22))
@@ -580,9 +589,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addLava(rect: CGRect(x: w * 0.55, y: 30, width: w * 0.25, height: 20)) // 右底溶岩
 
         // ── スパイク ──
-        addSpike(at: CGPoint(x: w * 0.85, y: 30),     pointingUp: true)  // 床右スパイク
-        addSpike(at: CGPoint(x: w * 0.15, y: h - 20), pointingUp: false) // 天井左スパイク
-        addSpike(at: CGPoint(x: w * 0.5,  y: h - 20), pointingUp: false) // 天井中央スパイク
+        addSpike(at: CGPoint(x: w * 0.85, y: 30),     direction: .up)  // 床右スパイク
+        addSpike(at: CGPoint(x: w * 0.15, y: h - 20), direction: .down) // 天井左スパイク
+        addSpike(at: CGPoint(x: w * 0.5,  y: h - 20), direction: .down) // 天井中央スパイク
 
         // ── ゴール（ゴール台の上）──
         addGoal(at: CGPoint(x: w * 0.73, y: h * 0.88 + 16 + 22))
@@ -621,15 +630,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addFloor(rect: CGRect(x: w * 0.42, y: h * 0.42, width: w * 0.13, height: 16), isTerrain: false)
 
         // ── スパイク（仕切り端と床・天井に密集）──
-        addSpike(at: CGPoint(x: w * 0.45, y: h * 0.35 + 2),  pointingUp: true)  // 仕切り左上端スパイク
-        addSpike(at: CGPoint(x: w * 0.45, y: h * 0.55 - 2),  pointingUp: false) // 仕切り左下端スパイク（上段）
-        addSpike(at: CGPoint(x: w * 0.62, y: h * 0.25 + 2),  pointingUp: true)  // 仕切り右上端スパイク
-        addSpike(at: CGPoint(x: w * 0.62, y: h * 0.45 - 2),  pointingUp: false) // 仕切り右下端スパイク（上段）
-        addSpike(at: CGPoint(x: w * 0.25, y: 30),             pointingUp: true)  // 床スパイク①
-        addSpike(at: CGPoint(x: w * 0.7,  y: 30),             pointingUp: true)  // 床スパイク②
-        addSpike(at: CGPoint(x: w * 0.85, y: 30),             pointingUp: true)  // 床スパイク③
-        addSpike(at: CGPoint(x: w * 0.4,  y: h - 20),         pointingUp: false) // 天井スパイク①
-        addSpike(at: CGPoint(x: w * 0.6,  y: h - 20),         pointingUp: false) // 天井スパイク②
+        addSpike(at: CGPoint(x: w * 0.45, y: h * 0.35 + 2),  direction: .up)  // 仕切り左上端スパイク
+        addSpike(at: CGPoint(x: w * 0.45, y: h * 0.55 - 2),  direction: .down) // 仕切り左下端スパイク（上段）
+        addSpike(at: CGPoint(x: w * 0.62, y: h * 0.25 + 2),  direction: .up)  // 仕切り右上端スパイク
+        addSpike(at: CGPoint(x: w * 0.62, y: h * 0.45 - 2),  direction: .down) // 仕切り右下端スパイク（上段）
+        addSpike(at: CGPoint(x: w * 0.25, y: 30),             direction: .up)  // 床スパイク①
+        addSpike(at: CGPoint(x: w * 0.7,  y: 30),             direction: .up)  // 床スパイク②
+        addSpike(at: CGPoint(x: w * 0.85, y: 30),             direction: .up)  // 床スパイク③
+        addSpike(at: CGPoint(x: w * 0.4,  y: h - 20),         direction: .down) // 天井スパイク①
+        addSpike(at: CGPoint(x: w * 0.6,  y: h - 20),         direction: .down) // 天井スパイク②
 
         // ── 溶岩（仕切り間の床）──
         addLava(rect: CGRect(x: w * 0.55, y: 30, width: w * 0.12, height: 16))
@@ -670,10 +679,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addBlinkingFloor(rect: CGRect(x: w * 0.22, y: h * 0.5, width: w * 0.12, height: 14))
 
         // ── スパイク ──
-        addSpike(at: CGPoint(x: w * 0.3,  y: h * 0.12 + 20), pointingUp: true)  // 島①右端スパイク
-        addSpike(at: CGPoint(x: w * 0.6,  y: h * 0.22 + 20), pointingUp: true)  // 島②右端スパイク
-        addSpike(at: CGPoint(x: w * 0.55, y: h - 20),         pointingUp: false) // 天井スパイク①
-        addSpike(at: CGPoint(x: w * 0.8,  y: h - 20),         pointingUp: false) // 天井スパイク②
+        addSpike(at: CGPoint(x: w * 0.3,  y: h * 0.12 + 20), direction: .up)  // 島①右端スパイク
+        addSpike(at: CGPoint(x: w * 0.6,  y: h * 0.22 + 20), direction: .up)  // 島②右端スパイク
+        addSpike(at: CGPoint(x: w * 0.55, y: h - 20),         direction: .down) // 天井スパイク①
+        addSpike(at: CGPoint(x: w * 0.8,  y: h - 20),         direction: .down) // 天井スパイク②
 
         // ── ゴール（島⑥の上）──
         addGoal(at: CGPoint(x: w * 0.73, y: h * 0.72 + 20 + 22))
@@ -695,13 +704,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addOuterWalls()
 
         // ── 天井スパイク（上向き重力への強い抑止）──
-        addSpike(at: CGPoint(x: w * 0.25, y: h - 20), pointingUp: false) // 天井①
-        addSpike(at: CGPoint(x: w * 0.35, y: h - 20), pointingUp: false) // 天井②
-        addSpike(at: CGPoint(x: w * 0.45, y: h - 20), pointingUp: false) // 天井③
-        addSpike(at: CGPoint(x: w * 0.55, y: h - 20), pointingUp: false) // 天井④
-        addSpike(at: CGPoint(x: w * 0.65, y: h - 20), pointingUp: false) // 天井⑤
-        addSpike(at: CGPoint(x: w * 0.75, y: h - 20), pointingUp: false) // 天井⑥
-        addSpike(at: CGPoint(x: w * 0.85, y: h - 20), pointingUp: false) // 天井⑦
+        addSpike(at: CGPoint(x: w * 0.25, y: h - 20), direction: .down) // 天井①
+        addSpike(at: CGPoint(x: w * 0.35, y: h - 20), direction: .down) // 天井②
+        addSpike(at: CGPoint(x: w * 0.45, y: h - 20), direction: .down) // 天井③
+        addSpike(at: CGPoint(x: w * 0.55, y: h - 20), direction: .down) // 天井④
+        addSpike(at: CGPoint(x: w * 0.65, y: h - 20), direction: .down) // 天井⑤
+        addSpike(at: CGPoint(x: w * 0.75, y: h - 20), direction: .down) // 天井⑥
+        addSpike(at: CGPoint(x: w * 0.85, y: h - 20), direction: .down) // 天井⑦
 
         // ── 上段の足場（スタート台）──
         addFloor(rect: CGRect(x: 20,       y: h * 0.8,  width: w * 0.22, height: 16), isTerrain: false) // 左上スタート台
@@ -720,9 +729,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addBlinkingFloor(rect: CGRect(x: w * 0.3, y: h * 0.45, width: w * 0.22, height: 14))
 
         // ── 床スパイク ──
-        addSpike(at: CGPoint(x: w * 0.3,  y: 30), pointingUp: true) // 床スパイク①
-        addSpike(at: CGPoint(x: w * 0.5,  y: 30), pointingUp: true) // 床スパイク②
-        addSpike(at: CGPoint(x: w * 0.7,  y: 30), pointingUp: true) // 床スパイク③
+        addSpike(at: CGPoint(x: w * 0.3,  y: 30), direction: .up) // 床スパイク①
+        addSpike(at: CGPoint(x: w * 0.5,  y: 30), direction: .up) // 床スパイク②
+        addSpike(at: CGPoint(x: w * 0.7,  y: 30), direction: .up) // 床スパイク③
 
         // ── 溶岩 ──
         addLava(rect: CGRect(x: w * 0.4, y: 30, width: w * 0.2, height: 18))
@@ -763,11 +772,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addFloor(rect: CGRect(x: w * 0.63, y: h * 0.62, width: w * 0.17, height: 14), isTerrain: false) // 右中上段（ゴール台）
 
         // ── スパイク ──
-        addSpike(at: CGPoint(x: w * 0.45, y: 30),             pointingUp: true)  // 床中央スパイク
-        addSpike(at: CGPoint(x: w * 0.75, y: 30),             pointingUp: true)  // 床右スパイク
-        addSpike(at: CGPoint(x: w * 0.45, y: h - 20),         pointingUp: false) // 天井スパイク①
-        addSpike(at: CGPoint(x: w * 0.75, y: h - 20),         pointingUp: false) // 天井スパイク②
-        addSpike(at: CGPoint(x: w * 0.45, y: h * 0.38 + 16), pointingUp: true)  // 横仕切り①の上端スパイク
+        addSpike(at: CGPoint(x: w * 0.45, y: 30),             direction: .up)  // 床中央スパイク
+        addSpike(at: CGPoint(x: w * 0.75, y: 30),             direction: .up)  // 床右スパイク
+        addSpike(at: CGPoint(x: w * 0.45, y: h - 20),         direction: .down) // 天井スパイク①
+        addSpike(at: CGPoint(x: w * 0.75, y: h - 20),         direction: .down) // 天井スパイク②
+        addSpike(at: CGPoint(x: w * 0.45, y: h * 0.38 + 16), direction: .up)  // 横仕切り①の上端スパイク
 
         // ── 溶岩（左端の小さな溶岩）──
         addLava(rect: CGRect(x: 20, y: 30, width: w * 0.1, height: 18))
@@ -808,16 +817,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addFloor(rect: CGRect(x: w * 0.62, y: h * 0.1, width: w * 0.18, height: 16), isTerrain: false)
 
         // ── 天井スパイク（密集）──
-        addSpike(at: CGPoint(x: w * 0.35, y: h - 20), pointingUp: false) // 天井①
-        addSpike(at: CGPoint(x: w * 0.5,  y: h - 20), pointingUp: false) // 天井②
-        addSpike(at: CGPoint(x: w * 0.65, y: h - 20), pointingUp: false) // 天井③
-        addSpike(at: CGPoint(x: w * 0.8,  y: h - 20), pointingUp: false) // 天井④
+        addSpike(at: CGPoint(x: w * 0.35, y: h - 20), direction: .down) // 天井①
+        addSpike(at: CGPoint(x: w * 0.5,  y: h - 20), direction: .down) // 天井②
+        addSpike(at: CGPoint(x: w * 0.65, y: h - 20), direction: .down) // 天井③
+        addSpike(at: CGPoint(x: w * 0.8,  y: h - 20), direction: .down) // 天井④
 
         // ── 床スパイク ──
-        addSpike(at: CGPoint(x: w * 0.2,  y: 30), pointingUp: true) // 床スパイク①
-        addSpike(at: CGPoint(x: w * 0.4,  y: 30), pointingUp: true) // 床スパイク②
-        addSpike(at: CGPoint(x: w * 0.6,  y: 30), pointingUp: true) // 床スパイク③
-        addSpike(at: CGPoint(x: w * 0.8,  y: 30), pointingUp: true) // 床スパイク④
+        addSpike(at: CGPoint(x: w * 0.2,  y: 30), direction: .up) // 床スパイク①
+        addSpike(at: CGPoint(x: w * 0.4,  y: 30), direction: .up) // 床スパイク②
+        addSpike(at: CGPoint(x: w * 0.6,  y: 30), direction: .up) // 床スパイク③
+        addSpike(at: CGPoint(x: w * 0.8,  y: 30), direction: .up) // 床スパイク④
 
         // ── 溶岩（大面積）──
         addLava(rect: CGRect(x: 20,       y: 30, width: w * 0.15, height: h * 0.12)) // 左底溶岩
@@ -825,8 +834,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addLava(rect: CGRect(x: w * 0.65, y: 30, width: w * 0.15, height: h * 0.07)) // 右底溶岩
 
         // ── 追加スパイク（足場の縁）──
-        addSpike(at: CGPoint(x: w * 0.5,  y: h * 0.72 + 14), pointingUp: true) // 足場②右端スパイク
-        addSpike(at: CGPoint(x: w * 0.73, y: h * 0.62 + 14), pointingUp: true) // 足場③右端スパイク
+        addSpike(at: CGPoint(x: w * 0.5,  y: h * 0.72 + 14), direction: .up) // 足場②右端スパイク
+        addSpike(at: CGPoint(x: w * 0.73, y: h * 0.62 + 14), direction: .up) // 足場③右端スパイク
 
         // ── ゴール（ゴール台の上）──
         addGoal(at: CGPoint(x: w * 0.73, y: h * 0.1 + 16 + 22))
@@ -869,18 +878,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addBlinkingFloor(rect: CGRect(x: w * 0.55, y: h * 0.8,  width: w * 0.25, height: 12)) // 右上の消える床
 
         // ── 天井スパイク（6本・密集）──
-        addSpike(at: CGPoint(x: w * 0.2,  y: h - 20), pointingUp: false) // 天井①
-        addSpike(at: CGPoint(x: w * 0.32, y: h - 20), pointingUp: false) // 天井②
-        addSpike(at: CGPoint(x: w * 0.44, y: h - 20), pointingUp: false) // 天井③
-        addSpike(at: CGPoint(x: w * 0.56, y: h - 20), pointingUp: false) // 天井④
-        addSpike(at: CGPoint(x: w * 0.68, y: h - 20), pointingUp: false) // 天井⑤
-        addSpike(at: CGPoint(x: w * 0.8,  y: h - 20), pointingUp: false) // 天井⑥
+        addSpike(at: CGPoint(x: w * 0.2,  y: h - 20), direction: .down) // 天井①
+        addSpike(at: CGPoint(x: w * 0.32, y: h - 20), direction: .down) // 天井②
+        addSpike(at: CGPoint(x: w * 0.44, y: h - 20), direction: .down) // 天井③
+        addSpike(at: CGPoint(x: w * 0.56, y: h - 20), direction: .down) // 天井④
+        addSpike(at: CGPoint(x: w * 0.68, y: h - 20), direction: .down) // 天井⑤
+        addSpike(at: CGPoint(x: w * 0.8,  y: h - 20), direction: .down) // 天井⑥
 
         // ── 床スパイク ──
-        addSpike(at: CGPoint(x: w * 0.25, y: 30), pointingUp: true) // 床スパイク①
-        addSpike(at: CGPoint(x: w * 0.5,  y: 30), pointingUp: true) // 床スパイク②
-        addSpike(at: CGPoint(x: w * 0.72, y: 30), pointingUp: true) // 床スパイク③
-        addSpike(at: CGPoint(x: w * 0.85, y: 30), pointingUp: true) // 床スパイク④
+        addSpike(at: CGPoint(x: w * 0.25, y: 30), direction: .up) // 床スパイク①
+        addSpike(at: CGPoint(x: w * 0.5,  y: 30), direction: .up) // 床スパイク②
+        addSpike(at: CGPoint(x: w * 0.72, y: 30), direction: .up) // 床スパイク③
+        addSpike(at: CGPoint(x: w * 0.85, y: 30), direction: .up) // 床スパイク④
 
         // ── 溶岩（大面積・複数箇所）──
         addLava(rect: CGRect(x: 20,       y: 30, width: w * 0.2,  height: h * 0.18))       // 左底大溶岩
@@ -888,8 +897,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addLava(rect: CGRect(x: w * 0.22, y: h * 0.78, width: w * 0.18, height: h * 0.1)) // 左上溶岩
 
         // ── 追加スパイク（足場の縁）──
-        addSpike(at: CGPoint(x: w * 0.45, y: h * 0.35 + 14), pointingUp: true) // 左中足場の右端スパイク
-        addSpike(at: CGPoint(x: w * 0.82, y: h * 0.32 + 14), pointingUp: true) // 右中下足場の右端スパイク
+        addSpike(at: CGPoint(x: w * 0.45, y: h * 0.35 + 14), direction: .up) // 左中足場の右端スパイク
+        addSpike(at: CGPoint(x: w * 0.82, y: h * 0.32 + 14), direction: .up) // 右中下足場の右端スパイク
 
         // ── ゴール（右上の上）──
         addGoal(at: CGPoint(x: w * 0.77, y: h * 0.65 + 14 + 22))
@@ -897,7 +906,112 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         spawnPlayer()
     }
 
-    // MARK: - Node Factories
+    // MARK: - Debug Grid
+    // デバッグモードON時のみ表示される座標グリッド。
+    // グリッド間隔はソースコードの座標系（pt）と一致する。
+    // 左下が原点(0,0), 右方向がX増加, 上方向がY増加。
+
+    private func addDebugGrid() {
+        let spacing: CGFloat = 50          // グリッド間隔（pt）— ソースコード座標と同単位
+        let lineColor  = UIColor(red: 0.0, green: 1.0, blue: 0.5, alpha: 0.18)
+        let label100   = UIColor(red: 0.0, green: 1.0, blue: 0.5, alpha: 0.85)
+        let label50    = UIColor(red: 0.0, green: 1.0, blue: 0.5, alpha: 0.45)
+
+        // ── 縦線 + X座標ラベル ──
+        var x: CGFloat = 0
+        while x <= size.width {
+            let path = CGMutablePath()
+            path.move(to: CGPoint(x: x, y: 0))
+            path.addLine(to: CGPoint(x: x, y: size.height))
+            let line = SKShapeNode(path: path)
+            line.strokeColor = lineColor
+            line.lineWidth = (Int(x) % 100 == 0) ? 0.8 : 0.4
+            line.zPosition = 55
+            addChild(line)
+
+            // 100pt おきにX座標ラベル（画面下部）
+            if Int(x) % 100 == 0 && x > 0 {
+                let lbl = SKLabelNode(text: "\(Int(x))")
+                lbl.fontName = "AvenirNext-Medium"
+                lbl.fontSize = 9
+                lbl.fontColor = label100
+                lbl.horizontalAlignmentMode = .center
+                lbl.verticalAlignmentMode = .bottom
+                lbl.position = CGPoint(x: x, y: 33)
+                lbl.zPosition = 56
+                addChild(lbl)
+            } else if Int(x) % 100 != 0 && x > 0 {
+                // 50pt ラベル（小さめ）
+                let lbl = SKLabelNode(text: "\(Int(x))")
+                lbl.fontName = "AvenirNext-Medium"
+                lbl.fontSize = 7
+                lbl.fontColor = label50
+                lbl.horizontalAlignmentMode = .center
+                lbl.verticalAlignmentMode = .bottom
+                lbl.position = CGPoint(x: x, y: 33)
+                lbl.zPosition = 56
+                addChild(lbl)
+            }
+            x += spacing
+        }
+
+        // ── 横線 + Y座標ラベル ──
+        var y: CGFloat = 0
+        while y <= size.height {
+            let path = CGMutablePath()
+            path.move(to: CGPoint(x: 0, y: y))
+            path.addLine(to: CGPoint(x: size.width, y: y))
+            let line = SKShapeNode(path: path)
+            line.strokeColor = lineColor
+            line.lineWidth = (Int(y) % 100 == 0) ? 0.8 : 0.4
+            line.zPosition = 55
+            addChild(line)
+
+            // 100pt おきにY座標ラベル（画面左端）
+            if Int(y) % 100 == 0 && y > 30 {
+                let lbl = SKLabelNode(text: "\(Int(y))")
+                lbl.fontName = "AvenirNext-Medium"
+                lbl.fontSize = 9
+                lbl.fontColor = label100
+                lbl.horizontalAlignmentMode = .left
+                lbl.verticalAlignmentMode = .center
+                lbl.position = CGPoint(x: 22, y: y)
+                lbl.zPosition = 56
+                addChild(lbl)
+            } else if Int(y) % 100 != 0 && y > 30 {
+                let lbl = SKLabelNode(text: "\(Int(y))")
+                lbl.fontName = "AvenirNext-Medium"
+                lbl.fontSize = 7
+                lbl.fontColor = label50
+                lbl.horizontalAlignmentMode = .left
+                lbl.verticalAlignmentMode = .center
+                lbl.position = CGPoint(x: 22, y: y)
+                lbl.zPosition = 56
+                addChild(lbl)
+            }
+            y += spacing
+        }
+
+        // ── 情報バッジ（グリッド間隔 + 画面サイズ表示）──
+        let infoNode = SKShapeNode(rectOf: CGSize(width: 160, height: 36), cornerRadius: 6)
+        infoNode.position = CGPoint(x: size.width - 90, y: size.height - 90)
+        infoNode.fillColor = UIColor(red: 0, green: 0.1, blue: 0, alpha: 0.75)
+        infoNode.strokeColor = UIColor(red: 0.0, green: 1.0, blue: 0.5, alpha: 0.6)
+        infoNode.lineWidth = 1
+        infoNode.zPosition = 115
+        addChild(infoNode)
+
+        let infoText = SKLabelNode(text: "GRID \(Int(spacing))pt  w=\(Int(size.width)) h=\(Int(size.height))")
+        infoText.fontName = "AvenirNext-Bold"
+        infoText.fontSize = 10
+        infoText.fontColor = UIColor(red: 0.0, green: 1.0, blue: 0.5, alpha: 1.0)
+        infoText.horizontalAlignmentMode = .center
+        infoText.verticalAlignmentMode = .center
+        infoText.zPosition = 116
+        infoNode.addChild(infoText)
+    }
+
+        // MARK: - Node Factories
 
     private func addFloor(rect: CGRect, isTerrain: Bool) {
         let node = SKShapeNode(rect: rect)
@@ -921,26 +1035,58 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(node)
     }
 
-    private func addSpike(at tip: CGPoint, pointingUp: Bool) {
-        let size: CGFloat = 20
+    private func addSpike(at base: CGPoint, direction: SpikeDirection) {
+        let tipLen: CGFloat = 20  // スパイクの長さ（先端まで）
+        let halfW: CGFloat = 10   // スパイクの底辺の半幅
+
+        // ── ビジュアル（三角形パス）──
+        // base: スパイクの平らな底辺の中心座標
+        // 先端はdirectionの方向へ tipLen だけ伸びる
         let path = CGMutablePath()
-        if pointingUp {
-            path.move(to: CGPoint(x: tip.x, y: tip.y + size))
-            path.addLine(to: CGPoint(x: tip.x - size / 2, y: tip.y))
-            path.addLine(to: CGPoint(x: tip.x + size / 2, y: tip.y))
-        } else {
-            path.move(to: CGPoint(x: tip.x, y: tip.y - size))
-            path.addLine(to: CGPoint(x: tip.x - size / 2, y: tip.y))
-            path.addLine(to: CGPoint(x: tip.x + size / 2, y: tip.y))
+        switch direction {
+        case .up:
+            path.move(to: CGPoint(x: base.x, y: base.y + tipLen))       // 上向き先端
+            path.addLine(to: CGPoint(x: base.x - halfW, y: base.y))     // 底辺左
+            path.addLine(to: CGPoint(x: base.x + halfW, y: base.y))     // 底辺右
+        case .down:
+            path.move(to: CGPoint(x: base.x, y: base.y - tipLen))       // 下向き先端
+            path.addLine(to: CGPoint(x: base.x - halfW, y: base.y))     // 底辺左
+            path.addLine(to: CGPoint(x: base.x + halfW, y: base.y))     // 底辺右
+        case .right:
+            path.move(to: CGPoint(x: base.x + tipLen, y: base.y))       // 右向き先端
+            path.addLine(to: CGPoint(x: base.x, y: base.y - halfW))     // 底辺下
+            path.addLine(to: CGPoint(x: base.x, y: base.y + halfW))     // 底辺上
+        case .left:
+            path.move(to: CGPoint(x: base.x - tipLen, y: base.y))       // 左向き先端
+            path.addLine(to: CGPoint(x: base.x, y: base.y - halfW))     // 底辺下
+            path.addLine(to: CGPoint(x: base.x, y: base.y + halfW))     // 底辺上
         }
         path.closeSubpath()
+
         let node = SKShapeNode(path: path)
         let theme = ThemeManager.shared
         node.fillColor = theme.spikeFillColor
         node.strokeColor = theme.spikeStrokeColor
         node.lineWidth = 1.5
-        let body = SKPhysicsBody(rectangleOf: CGSize(width: size, height: size / 2),
-                                 center: CGPoint(x: tip.x, y: tip.y + (pointingUp ? size / 4 : -size / 4)))
+
+        // ── 当たり判定（矩形・先端側の半分をカバー）──
+        let bodyCenter: CGPoint
+        let bodySize: CGSize
+        switch direction {
+        case .up:
+            bodySize = CGSize(width: tipLen, height: tipLen / 2)
+            bodyCenter = CGPoint(x: base.x, y: base.y + tipLen / 4)
+        case .down:
+            bodySize = CGSize(width: tipLen, height: tipLen / 2)
+            bodyCenter = CGPoint(x: base.x, y: base.y - tipLen / 4)
+        case .right:
+            bodySize = CGSize(width: tipLen / 2, height: tipLen)
+            bodyCenter = CGPoint(x: base.x + tipLen / 4, y: base.y)
+        case .left:
+            bodySize = CGSize(width: tipLen / 2, height: tipLen)
+            bodyCenter = CGPoint(x: base.x - tipLen / 4, y: base.y)
+        }
+        let body = SKPhysicsBody(rectangleOf: bodySize, center: bodyCenter)
         body.isDynamic = false
         body.categoryBitMask = PhysicsCategory.hazard
         body.collisionBitMask = PhysicsCategory.none
@@ -1351,11 +1497,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
     override func update(_ currentTime: TimeInterval) {
         guard let body = playerNode?.physicsBody else { return }
-        let speed = sqrt(body.velocity.dx * body.velocity.dx + body.velocity.dy * body.velocity.dy)
-        let angularSpeed = abs(body.angularVelocity)
-        if speed < 15.0 && angularSpeed < 0.3 {
+        let vx = body.velocity.dx
+        let vy = body.velocity.dy
+        let speed = sqrt(vx * vx + vy * vy)
+
+        if speed < 15.0 {
+            // ほぼ静止：速度と回転を強制的にゼロにして無駄な微動を止める
             body.velocity = .zero
             body.angularVelocity = 0
+        } else {
+            // 移動中は速度に比例して回転させる（地面上・空中どちらでも）
+            // 重力方向に垂直な速度成分でロールさせることで自然な回転に見える
+            let radius: CGFloat = 15.0
+            switch gravityDirection {
+            case .down, .up:
+                body.angularVelocity = -vx / radius
+            case .left, .right:
+                body.angularVelocity = vy / radius
+            }
         }
     }
 
