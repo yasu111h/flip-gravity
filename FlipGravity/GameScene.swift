@@ -82,6 +82,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // 1セル = 30pt。シーンサイズ固定: 390×840
     // 列: 0=左壁左端 〜 13=右壁右端、行: 0=床下端 〜 26=天井ライン
     private let C: CGFloat = 30
+    private let ballSizeCells: CGFloat = 1   // ボールサイズ（セル単位）1=1マス分
+    private let goalSizeCells: CGFloat = 1   // ゴールサイズ（セル単位）1=1マス分
     private var gravityDirection: GravityDirection = .down
     private var playerNode: SKShapeNode!
     private var deathCount = 0
@@ -275,15 +277,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //  1セル(C) = 30pt
     //  グリッド: 13列 × 28行
     //
-    //  ┌─ col 0                   col 13 ─┐
-    //  │  ├─ 左壁 ─┤           ├─ 右壁 ─┤│
+    //  ┌─ col 0                    col 13 ─┐
+    //  │  ├─ 左壁 ─┤              ├─ 右壁 ─┤│
     //  │                                   │ ← row 28
-    //  │  [セーフティ余白 row 27-28]        │
+    //  │  [セーフティ余白 row 27-28]          │
     //  │  [HUDバー         row 25-27]       │
     //  │  ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ row 25 ← 天井ライン
     //  │                                   │
-    //  │  プレイエリア内側                  │
-    //  │  col 1〜12, row 1〜24             │
+    //  │  プレイエリア内側                    │
+    //  │  col 1〜12, row 1〜24              │
     //  │                                   │
     //  │  ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ row 1 ← 床ライン
     //  └─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ row 0 ─┘
@@ -324,20 +326,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       左下からスタートし、足場を踏み替えながら左上のゴールを目指す。
     // ─────────────────────────────────────────────
     private func buildStage1() {
-        spawnPoint = gp(2, 6)
+        spawnPoint = gp(1.5, 5.5)
         addOuterWalls()
         addFloor(x: 1, y: 3, w: 4)
         addFloor(x: 6, y: 10, w: 3)
         addFloor(x: 8, y: 18, w: 3)
         addFloor(x: 1, y: 20, w: 3)
         addFloor(x: 4, y: 23, w: 3)
+        addSpike(col: 1, row: 1, direction: .up)
         addSpike(col: 1.5, row: 1, direction: .up)
-        addSpike(col: 2, row: 1, direction: .up)
-        addSpike(col: 9, row: 10.5, direction: .up)
-        addSpike(col: 10.5, row: 25, direction: .down)
-        addLava(x: 4.5, y: 1, w: 5)
+        addSpike(col: 8.5, row: 10, direction: .up)
+        addSpike(col: 10, row: 24, direction: .down)
+        addLava(x: 4, y: 1, w: 5)
         addBlinkingFloor(x: 6, y: 15, w: 3)
-        addGoal(col: 5.5, row: 24)
+        addGoal(col: 5, row: 23.5)
         spawnPlayer()
     }
 
@@ -349,7 +351,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       仕切りの上か隙間を抜ける必要がある。
     // ─────────────────────────────────────────────
     private func buildStage2() {
-        spawnPoint = gp(2, 3)
+        spawnPoint = gp(1.5, 2.5)
         addOuterWalls()
         // 縦仕切り左: x=5, y=1, w=0.5, h=14
         addFloor(x: 5, y: 1, w: 0.5, h: 14, isTerrain: true)
@@ -363,12 +365,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addFloor(x: 8, y: 7, w: 2.5)
         // 足場右上段（ゴール台）
         addFloor(x: 8, y: 17, w: 2.5)
-        addSpike(col: 2.5, row: 25, direction: .down)
-        addSpike(col: 9, row: 1, direction: .up)
-        addSpike(col: 9, row: 12, direction: .down)
-        addSpike(col: 11, row: 1, direction: .up)
+        addSpike(col: 2, row: 24, direction: .down)
+        addSpike(col: 8.5, row: 1, direction: .up)
+        addSpike(col: 8.5, row: 11, direction: .down)
+        addSpike(col: 10.5, row: 1, direction: .up)
         addLava(x: 1, y: 11, w: 2.5)
-        addGoal(col: 10, row: 18)
+        addGoal(col: 9.5, row: 17.5)
         spawnPlayer()
     }
 
@@ -380,7 +382,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       上向き重力に切り替えて上半分を渡るのが攻略の鍵。
     // ─────────────────────────────────────────────
     private func buildStage3() {
-        spawnPoint = gp(2, 17)
+        spawnPoint = gp(1.5, 16.5)
         addOuterWalls()
         // 溶岩（下半分）
         addLava(x: 1, y: 1, w: 4)        // 左下大溶岩
@@ -395,11 +397,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addFloor(x: 4, y: 11, w: 1.5)    // 中段左の中継
         addFloor(x: 9, y: 11, w: 1)      // 中段右の中継
         // 天井スパイク
-        addSpike(col: 6.5, row: 25, direction: .down)
-        addSpike(col: 3, row: 25, direction: .down)
-        addSpike(col: 10, row: 25, direction: .down)
+        addSpike(col: 6, row: 24, direction: .down)
+        addSpike(col: 2.5, row: 24, direction: .down)
+        addSpike(col: 9.5, row: 24, direction: .down)
         // ゴール
-        addGoal(col: 9.5, row: 16)
+        addGoal(col: 9, row: 15.5)
         spawnPlayer()
     }
 
@@ -411,7 +413,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       順番を考えて素早く渡らないとゴールに届かない。
     // ─────────────────────────────────────────────
     private func buildStage4() {
-        spawnPoint = gp(1.5, 4)
+        spawnPoint = gp(1, 3.5)
         addOuterWalls()
         // 固定足場
         addFloor(x: 1, y: 2.5, w: 2.5)     // 左下スタート台
@@ -423,13 +425,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addBlinkingFloor(x: 3, y: 15.5, w: 2.5)   // ③
         addBlinkingFloor(x: 7, y: 20, w: 2.5)     // ④
         // スパイク
-        addSpike(col: 6, row: 1, direction: .up)
-        addSpike(col: 8, row: 1, direction: .up)
-        addSpike(col: 10, row: 1, direction: .up)
+        addSpike(col: 5.5, row: 1, direction: .up)
+        addSpike(col: 7.5, row: 1, direction: .up)
+        addSpike(col: 9.5, row: 1, direction: .up)
         // 溶岩
         addLava(x: 2.5, y: 1, w: 3)
         // ゴール
-        addGoal(col: 10, row: 24)
+        addGoal(col: 9.5, row: 23.5)
         spawnPlayer()
     }
 
@@ -441,7 +443,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       スパイク・溶岩・消える床の全種類が登場する。
     // ─────────────────────────────────────────────
     private func buildStage5() {
-        spawnPoint = gp(1.5, 3)
+        spawnPoint = gp(1, 2.5)
         addOuterWalls()
         // 縦の仕切り壁
         addFloor(x: 6, y: 1, w: 0.5, h: 10, isTerrain: true)    // 中央仕切り下部
@@ -458,17 +460,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addBlinkingFloor(x: 3, y: 15, w: 2.5)  // 左側の消える床
         addBlinkingFloor(x: 7, y: 15, w: 2.5)  // 右側の消える床
         // スパイク
-        addSpike(col: 4, row: 1, direction: .up)
-        addSpike(col: 9, row: 1, direction: .up)
-        addSpike(col: 4, row: 25, direction: .down)
-        addSpike(col: 9, row: 25, direction: .down)
-        addSpike(col: 1, row: 13.5, direction: .right)
-        addSpike(col: 12, row: 13.5, direction: .left)
+        addSpike(col: 3.5, row: 1, direction: .up)
+        addSpike(col: 8.5, row: 1, direction: .up)
+        addSpike(col: 3.5, row: 24, direction: .down)
+        addSpike(col: 8.5, row: 24, direction: .down)
+        addSpike(col: 1, row: 13, direction: .right)
+        addSpike(col: 11, row: 13, direction: .left)
         // 溶岩
         addLava(x: 1, y: 1, w: 3)
         addLava(x: 7.5, y: 1, w: 3)
         // ゴール
-        addGoal(col: 10, row: 21)
+        addGoal(col: 9.5, row: 20.5)
         spawnPlayer()
     }
 
@@ -479,7 +481,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       S字を描くような進行ルート。消える床が中継地点に1枚。
     // ─────────────────────────────────────────────
     private func buildStage6() {
-        spawnPoint = gp(2, 3)
+        spawnPoint = gp(1.5, 2.5)
         addOuterWalls()
         // 左側の足場
         addFloor(x: 1, y: 2.5, w: 3.5)   // L1: 左下スタート台
@@ -493,16 +495,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // 消える床
         addBlinkingFloor(x: 5, y: 9, w: 2.5)
         // スパイク
-        addSpike(col: 4.5, row: 1, direction: .up)
-        addSpike(col: 6.5, row: 1, direction: .up)
-        addSpike(col: 8.5, row: 1, direction: .up)
-        addSpike(col: 11, row: 16.5, direction: .up)
-        addSpike(col: 2, row: 25, direction: .down)
+        addSpike(col: 4, row: 1, direction: .up)
+        addSpike(col: 6, row: 1, direction: .up)
+        addSpike(col: 8, row: 1, direction: .up)
+        addSpike(col: 10.5, row: 16.5, direction: .up)
+        addSpike(col: 1.5, row: 24, direction: .down)
         // 溶岩
         addLava(x: 4, y: 1, w: 1)
         addLava(x: 9.5, y: 1, w: 1)
         // ゴール
-        addGoal(col: 10, row: 21)
+        addGoal(col: 9.5, row: 20.5)
         spawnPlayer()
     }
 
@@ -513,7 +515,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       重力を切り替えて対岸の足場へ飛び移るのが攻略の鍵。
     // ─────────────────────────────────────────────
     private func buildStage7() {
-        spawnPoint = gp(2, 2)
+        spawnPoint = gp(1.5, 1.5)
         addOuterWalls()
         // ジグザグ足場
         addFloor(x: 1, y: 4, w: 4.5)     // Z1: 左下
@@ -523,16 +525,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addFloor(x: 1, y: 19, w: 4.5)    // Z5: 左上
         addFloor(x: 6.5, y: 23, w: 4)    // Z6: 右上（ゴール台）
         // スパイク
-        addSpike(col: 2.5, row: 1, direction: .up)
-        addSpike(col: 9, row: 1, direction: .up)
-        addSpike(col: 5.5, row: 4.5, direction: .up)
-        addSpike(col: 11, row: 8, direction: .up)
-        addSpike(col: 5.5, row: 12, direction: .up)
-        addSpike(col: 2, row: 25, direction: .down)
+        addSpike(col: 2, row: 1, direction: .up)
+        addSpike(col: 8.5, row: 1, direction: .up)
+        addSpike(col: 5, row: 4.5, direction: .up)
+        addSpike(col: 10.5, row: 8, direction: .up)
+        addSpike(col: 5, row: 12, direction: .up)
+        addSpike(col: 1.5, row: 24, direction: .down)
         // 溶岩
         addLava(x: 4.5, y: 1, w: 2)
         // ゴール
-        addGoal(col: 9.5, row: 24)
+        addGoal(col: 9, row: 23.5)
         spawnPlayer()
     }
 
@@ -544,7 +546,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       天井にはスパイクが並んでいるので注意。
     // ─────────────────────────────────────────────
     private func buildStage8() {
-        spawnPoint = gp(1.5, 15)
+        spawnPoint = gp(1, 14.5)
         addOuterWalls()
         // スタート台（左中段）
         addFloor(x: 1, y: 14, w: 2.5)
@@ -562,11 +564,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addFloor(x: 3.5, y: 1, w: 0.5, h: 3, isTerrain: true)  // 柱①
         addFloor(x: 9, y: 1, w: 0.5, h: 4, isTerrain: true)    // 柱②
         // 天井スパイク
-        addSpike(col: 6.5, row: 25, direction: .down)
-        addSpike(col: 10, row: 25, direction: .down)
-        addSpike(col: 11.5, row: 25, direction: .down)
+        addSpike(col: 6, row: 24, direction: .down)
+        addSpike(col: 9.5, row: 24, direction: .down)
+        addSpike(col: 11, row: 24, direction: .down)
         // ゴール
-        addGoal(col: 4, row: 24)
+        addGoal(col: 3.5, row: 23.5)
         spawnPlayer()
     }
 
@@ -577,7 +579,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       踏んだ瞬間から時計が始まるので、素早く次の床へ移動せよ。
     // ─────────────────────────────────────────────
     private func buildStage9() {
-        spawnPoint = gp(1.5, 3)
+        spawnPoint = gp(1, 2.5)
         addOuterWalls()
         // スタート台（固定・左下）
         addFloor(x: 1, y: 2.5, w: 3)
@@ -594,11 +596,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addLava(x: 1, y: 1, w: 6.5)
         addLava(x: 7, y: 1, w: 3.5)
         // スパイク
-        addSpike(col: 11, row: 1, direction: .up)
-        addSpike(col: 2, row: 25, direction: .down)
-        addSpike(col: 6.5, row: 25, direction: .down)
+        addSpike(col: 10.5, row: 1, direction: .up)
+        addSpike(col: 1.5, row: 24, direction: .down)
+        addSpike(col: 6, row: 24, direction: .down)
         // ゴール
-        addGoal(col: 9.5, row: 24.5)
+        addGoal(col: 9, row: 24)
         spawnPlayer()
     }
 
@@ -609,7 +611,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       左右重力を駆使して狭い隙間を通り抜け、右上のゴールへ。
     // ─────────────────────────────────────────────
     private func buildStage10() {
-        spawnPoint = gp(2, 2.5)
+        spawnPoint = gp(1.5, 2)
         addOuterWalls()
         // 縦の仕切り壁（回廊を形成）
         addFloor(x: 5, y: 1, w: 0.5, h: 10, isTerrain: true)    // 仕切り左下
@@ -626,19 +628,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // 回廊内の中継
         addFloor(x: 5.5, y: 11.5, w: 2)
         // スパイク
-        addSpike(col: 5.5, row: 10, direction: .up)
-        addSpike(col: 5.5, row: 15.5, direction: .down)
-        addSpike(col: 8, row: 7, direction: .up)
-        addSpike(col: 8, row: 12.5, direction: .down)
-        addSpike(col: 3, row: 1, direction: .up)
-        addSpike(col: 9, row: 1, direction: .up)
-        addSpike(col: 11, row: 1, direction: .up)
-        addSpike(col: 5, row: 25, direction: .down)
-        addSpike(col: 8, row: 25, direction: .down)
+        addSpike(col: 5, row: 10, direction: .up)
+        addSpike(col: 5, row: 14.5, direction: .down)
+        addSpike(col: 7.5, row: 7, direction: .up)
+        addSpike(col: 7.5, row: 11.5, direction: .down)
+        addSpike(col: 2.5, row: 1, direction: .up)
+        addSpike(col: 8.5, row: 1, direction: .up)
+        addSpike(col: 10.5, row: 1, direction: .up)
+        addSpike(col: 4.5, row: 24, direction: .down)
+        addSpike(col: 7.5, row: 24, direction: .down)
         // 溶岩
         addLava(x: 7, y: 1, w: 1.5)
         // ゴール
-        addGoal(col: 9.5, row: 18)
+        addGoal(col: 9, row: 17.5)
         spawnPlayer()
     }
 
@@ -649,7 +651,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       重力を切り替えながら島から島へホップして右上のゴールへ。
     // ─────────────────────────────────────────────
     private func buildStage11() {
-        spawnPoint = gp(1.5, 4)
+        spawnPoint = gp(1, 3.5)
         addOuterWalls()
         // 島①〜⑥
         addFloor(x: 1, y: 3, w: 2.5)      // 島① 左下（スタート）
@@ -666,12 +668,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // 消える床
         addBlinkingFloor(x: 3, y: 14, w: 1.5)
         // スパイク
-        addSpike(col: 4, row: 3.5, direction: .up)   // 島①右端
-        addSpike(col: 7.5, row: 6.5, direction: .up) // 島②右端
-        addSpike(col: 7, row: 25, direction: .down)
-        addSpike(col: 10.5, row: 25, direction: .down)
+        addSpike(col: 3.5, row: 3.5, direction: .up)   // 島①右端
+        addSpike(col: 7, row: 6.5, direction: .up)     // 島②右端
+        addSpike(col: 6.5, row: 24, direction: .down)
+        addSpike(col: 10, row: 24, direction: .down)
         // ゴール
-        addGoal(col: 9.5, row: 21)
+        addGoal(col: 9, row: 20.5)
         spawnPlayer()
     }
 
@@ -683,16 +685,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       下向きに下りながら消える床も活用する。
     // ─────────────────────────────────────────────
     private func buildStage12() {
-        spawnPoint = gp(1.5, 22)
+        spawnPoint = gp(1, 21.5)
         addOuterWalls()
         // 天井スパイク（密集）
-        addSpike(col: 3, row: 25, direction: .down)
-        addSpike(col: 4.5, row: 25, direction: .down)
-        addSpike(col: 6, row: 25, direction: .down)
-        addSpike(col: 7, row: 25, direction: .down)
-        addSpike(col: 8.5, row: 25, direction: .down)
-        addSpike(col: 10, row: 25, direction: .down)
-        addSpike(col: 11, row: 25, direction: .down)
+        addSpike(col: 2.5, row: 24, direction: .down)
+        addSpike(col: 4, row: 24, direction: .down)
+        addSpike(col: 5.5, row: 24, direction: .down)
+        addSpike(col: 6.5, row: 24, direction: .down)
+        addSpike(col: 8, row: 24, direction: .down)
+        addSpike(col: 9.5, row: 24, direction: .down)
+        addSpike(col: 10.5, row: 24, direction: .down)
         // 上段の足場（スタート台）
         addFloor(x: 1, y: 22.5, w: 3)     // 左上スタート台
         addFloor(x: 7, y: 21, w: 3.5)     // 右上足場
@@ -706,13 +708,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // 消える床
         addBlinkingFloor(x: 4, y: 12.5, w: 3)
         // 床スパイク
-        addSpike(col: 4, row: 1, direction: .up)
-        addSpike(col: 6.5, row: 1, direction: .up)
-        addSpike(col: 9, row: 1, direction: .up)
+        addSpike(col: 3.5, row: 1, direction: .up)
+        addSpike(col: 6, row: 1, direction: .up)
+        addSpike(col: 8.5, row: 1, direction: .up)
         // 溶岩
         addLava(x: 5, y: 1, w: 2.5)
         // ゴール
-        addGoal(col: 9.5, row: 6)
+        addGoal(col: 9, row: 5.5)
         spawnPlayer()
     }
 
@@ -723,7 +725,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       各区画の隙間（仕切りの端の開口部）を見つけて右上のゴールへ。
     // ─────────────────────────────────────────────
     private func buildStage13() {
-        spawnPoint = gp(1.5, 3)
+        spawnPoint = gp(1, 2.5)
         addOuterWalls()
         // 縦仕切り（2本）
         addFloor(x: 4, y: 1, w: 0.5, h: 8, isTerrain: true)     // 縦①下半
@@ -740,15 +742,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addFloor(x: 8, y: 10.5, w: 2.5)    // 右中下段
         addFloor(x: 8, y: 17.5, w: 2.5)    // 右中上段（ゴール台）
         // スパイク
-        addSpike(col: 6, row: 1, direction: .up)
-        addSpike(col: 10, row: 1, direction: .up)
-        addSpike(col: 6, row: 25, direction: .down)
-        addSpike(col: 10, row: 25, direction: .down)
-        addSpike(col: 6, row: 11, direction: .up)
+        addSpike(col: 5.5, row: 1, direction: .up)
+        addSpike(col: 9.5, row: 1, direction: .up)
+        addSpike(col: 5.5, row: 24, direction: .down)
+        addSpike(col: 9.5, row: 24, direction: .down)
+        addSpike(col: 5.5, row: 11, direction: .up)
         // 溶岩
         addLava(x: 1, y: 1, w: 1.5)
         // ゴール
-        addGoal(col: 9.5, row: 18.5)
+        addGoal(col: 9, row: 18)
         spawnPlayer()
     }
 
@@ -760,7 +762,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       消える床を踏んだら即座に次の行動を判断すること。
     // ─────────────────────────────────────────────
     private func buildStage14() {
-        spawnPoint = gp(1.5, 23)
+        spawnPoint = gp(1, 22.5)
         addOuterWalls()
         // スタート台（左上）
         addFloor(x: 1, y: 23, w: 2.5)
@@ -775,24 +777,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // ゴール台（右下）
         addFloor(x: 8, y: 2.5, w: 2.5)
         // 天井スパイク
-        addSpike(col: 4.5, row: 25, direction: .down)
-        addSpike(col: 6.5, row: 25, direction: .down)
-        addSpike(col: 8.5, row: 25, direction: .down)
-        addSpike(col: 10.5, row: 25, direction: .down)
+        addSpike(col: 4, row: 24, direction: .down)
+        addSpike(col: 6, row: 24, direction: .down)
+        addSpike(col: 8, row: 24, direction: .down)
+        addSpike(col: 10, row: 24, direction: .down)
         // 床スパイク
-        addSpike(col: 2.5, row: 1, direction: .up)
-        addSpike(col: 5, row: 1, direction: .up)
-        addSpike(col: 8, row: 1, direction: .up)
-        addSpike(col: 10.5, row: 1, direction: .up)
+        addSpike(col: 2, row: 1, direction: .up)
+        addSpike(col: 4.5, row: 1, direction: .up)
+        addSpike(col: 7.5, row: 1, direction: .up)
+        addSpike(col: 10, row: 1, direction: .up)
         // 溶岩
         addLava(x: 1, y: 1, w: 2)
         addLava(x: 5.5, y: 1, w: 2)
         addLava(x: 8.5, y: 1, w: 2)
         // 追加スパイク
-        addSpike(col: 6.5, row: 20.5, direction: .up)   // 足場②右端
-        addSpike(col: 9.5, row: 18, direction: .up)      // 足場③右端
+        addSpike(col: 6, row: 20.5, direction: .up)   // 足場②右端
+        addSpike(col: 9, row: 18, direction: .up)      // 足場③右端
         // ゴール
-        addGoal(col: 9.5, row: 3.5)
+        addGoal(col: 9, row: 3)
         spawnPlayer()
     }
 
@@ -804,7 +806,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       4方向の重力を完全に使いこなして突破せよ。
     // ─────────────────────────────────────────────
     private func buildStage15() {
-        spawnPoint = gp(1.5, 3)
+        spawnPoint = gp(1, 2.5)
         addOuterWalls()
         // 中央仕切り（上下に隙間あり）
         addFloor(x: 5.5, y: 1, w: 0.5, h: 8.5, isTerrain: true)     // 仕切り下部
@@ -824,26 +826,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addBlinkingFloor(x: 6, y: 10.5, w: 1)        // 仕切り隙間の消える床
         addBlinkingFloor(x: 7, y: 22.5, w: 3.5)      // 右上の消える床
         // 天井スパイク（6本）
-        addSpike(col: 2.5, row: 25, direction: .down)
-        addSpike(col: 4, row: 25, direction: .down)
-        addSpike(col: 5.5, row: 25, direction: .down)
-        addSpike(col: 7, row: 25, direction: .down)
-        addSpike(col: 8.5, row: 25, direction: .down)
-        addSpike(col: 10.5, row: 25, direction: .down)
+        addSpike(col: 2, row: 24, direction: .down)
+        addSpike(col: 3.5, row: 24, direction: .down)
+        addSpike(col: 5, row: 24, direction: .down)
+        addSpike(col: 6.5, row: 24, direction: .down)
+        addSpike(col: 8, row: 24, direction: .down)
+        addSpike(col: 10, row: 24, direction: .down)
         // 床スパイク
-        addSpike(col: 3, row: 1, direction: .up)
-        addSpike(col: 6.5, row: 1, direction: .up)
-        addSpike(col: 9.5, row: 1, direction: .up)
-        addSpike(col: 11, row: 1, direction: .up)
+        addSpike(col: 2.5, row: 1, direction: .up)
+        addSpike(col: 6, row: 1, direction: .up)
+        addSpike(col: 9, row: 1, direction: .up)
+        addSpike(col: 10.5, row: 1, direction: .up)
         // 溶岩
         addLava(x: 1, y: 1, w: 2.5)
         addLava(x: 5.5, y: 1, w: 3)
         addLava(x: 3, y: 22, w: 2.5)
         // 追加スパイク
-        addSpike(col: 5.5, row: 10, direction: .up)
-        addSpike(col: 10.5, row: 9.5, direction: .up)
+        addSpike(col: 5, row: 10, direction: .up)
+        addSpike(col: 10, row: 9.5, direction: .up)
         // ゴール
-        addGoal(col: 10, row: 19)
+        addGoal(col: 9.5, row: 18.5)
         spawnPlayer()
     }
 
@@ -940,24 +942,32 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         CGSize(width: cols * C, height: rows * C)
     }
     /// グリッド座標版 addFloor
-    private func addFloor(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat = 0.5, isTerrain: Bool = false) {
+    private func addFloor(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat = 1.0, isTerrain: Bool = false) {
         addFloor(rect: CGRect(x: x * C, y: y * C, width: w * C, height: h * C), isTerrain: isTerrain)
     }
     /// グリッド座標版 addLava
-    private func addLava(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat = 0.5) {
+    private func addLava(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat = 1.0) {
         addLava(rect: CGRect(x: x * C, y: y * C, width: w * C, height: h * C))
     }
     /// グリッド座標版 addBlinkingFloor
-    private func addBlinkingFloor(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat = 0.5) {
+    private func addBlinkingFloor(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat = 1.0) {
         addBlinkingFloor(rect: CGRect(x: x * C, y: y * C, width: w * C, height: h * C))
     }
-    /// グリッド座標版 addSpike
+    /// グリッド座標版 addSpike（(col,row) = スパイクが占める1セルの左下コーナー）
     private func addSpike(col: CGFloat, row: CGFloat, direction: SpikeDirection) {
-        addSpike(at: CGPoint(x: col * C, y: row * C), direction: direction)
+        let base: CGPoint
+        switch direction {
+        case .up:    base = CGPoint(x: (col + 0.5) * C, y: row * C)
+        case .down:  base = CGPoint(x: (col + 0.5) * C, y: (row + 1) * C)
+        case .right: base = CGPoint(x: col * C, y: (row + 0.5) * C)
+        case .left:  base = CGPoint(x: (col + 1) * C, y: (row + 0.5) * C)
+        }
+        addSpike(at: base, direction: direction)
     }
-    /// グリッド座標版 addGoal
+    /// グリッド座標版 addGoal（(col,row) = バウンディング正方形の左下コーナー）
     private func addGoal(col: CGFloat, row: CGFloat) {
-        addGoal(at: CGPoint(x: col * C, y: row * C))
+        let r = goalSizeCells * C / 2
+        addGoal(at: CGPoint(x: col * C + r, y: row * C + r))
     }
 
     private func addFloor(rect: CGRect, isTerrain: Bool) {
@@ -983,8 +993,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     private func addSpike(at base: CGPoint, direction: SpikeDirection) {
-        let tipLen: CGFloat = 20  // スパイクの長さ（先端まで）
-        let halfW: CGFloat = 10   // スパイクの底辺の半幅
+        let tipLen: CGFloat = C      // = 30pt（1セル分）
+        let halfW: CGFloat = C / 2   // = 15pt
 
         // ── ビジュアル（三角形パス）──
         // base: スパイクの平らな底辺の中心座標
@@ -1082,7 +1092,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     private func addGoal(at position: CGPoint) {
-        let node = SKShapeNode(circleOfRadius: 22)
+        let radius = goalSizeCells * C / 2
+        let node = SKShapeNode(circleOfRadius: radius)
         node.position = position
         let theme = ThemeManager.shared
         node.fillColor = theme.goalFillColor.withAlphaComponent(0.9)
@@ -1091,12 +1102,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         node.name = "goal"
         let label = SKLabelNode(text: "GOAL")
         label.fontName = "AvenirNext-Bold"
-        label.fontSize = 14
+        label.fontSize = 8
         label.fontColor = .white
         label.verticalAlignmentMode = .center
         label.horizontalAlignmentMode = .center
         node.addChild(label)
-        let body = SKPhysicsBody(circleOfRadius: 14)
+        let body = SKPhysicsBody(circleOfRadius: radius * 0.8)
         body.isDynamic = false
         body.categoryBitMask = PhysicsCategory.goal
         body.collisionBitMask = PhysicsCategory.none
@@ -1109,9 +1120,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
     private func spawnPlayer() {
         if playerNode != nil { playerNode.removeFromParent() }
-        let radius: CGFloat = 15
+        let radius = ballSizeCells * C / 2
         playerNode = SKShapeNode(circleOfRadius: radius)
-        playerNode.position = spawnPoint
+        playerNode.position = CGPoint(x: spawnPoint.x + radius, y: spawnPoint.y + radius)
         let theme = ThemeManager.shared
         playerNode.fillColor = theme.playerFillColor
         playerNode.strokeColor = theme.playerStrokeColor
