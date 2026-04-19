@@ -122,7 +122,20 @@ class StageSelectScene: SKScene {
 
     private func setupStageGrid() {
         let clearedStages = getClearedStages()
-        let unlockedCount = max(initialUnlocked, clearedStages.count + 1)
+        let isDebugMode = UserDefaults.standard.bool(forKey: "debugMode")
+        let unlockedCount = isDebugMode ? totalStages : max(initialUnlocked, clearedStages.count + 1)
+
+        if isDebugMode {
+            let debugLabel = SKLabelNode(text: "🔓 DEBUG MODE")
+            debugLabel.fontName = "AvenirNext-Bold"
+            debugLabel.fontSize = 12
+            debugLabel.fontColor = UIColor(red: 1.0, green: 0.7, blue: 0.2, alpha: 0.9)
+            debugLabel.horizontalAlignmentMode = .center
+            debugLabel.verticalAlignmentMode = .center
+            debugLabel.position = CGPoint(x: size.width - 70, y: size.height - 60)
+            debugLabel.zPosition = 10
+            addChild(debugLabel)
+        }
 
         let gridWidth = size.width * 0.9
         let gridHeight = size.height * 0.72

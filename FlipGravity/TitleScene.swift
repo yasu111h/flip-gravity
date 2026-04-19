@@ -5,6 +5,8 @@ class TitleScene: SKScene {
     // MARK: - Properties
 
     private var tapLabel: SKLabelNode!
+    private var debugButtonBg: SKShapeNode!
+    private var debugButtonLabel: SKLabelNode!
 
     // MARK: - Scene Setup
 
@@ -16,6 +18,7 @@ class TitleScene: SKScene {
         setupTitleLogo()
         setupTapLabel()
         setupSettingsButton()
+        setupDebugButton()
         setupDemoBalls()
     }
 
@@ -195,6 +198,59 @@ class TitleScene: SKScene {
         settingsBg.addChild(settingsLabel)
     }
 
+    // MARK: - Debug Button
+
+    private func setupDebugButton() {
+        let isOn = UserDefaults.standard.bool(forKey: "debugMode")
+
+        debugButtonBg = SKShapeNode(rectOf: CGSize(width: 100, height: 32), cornerRadius: 8)
+        debugButtonBg.position = CGPoint(x: 65, y: 36)
+        debugButtonBg.fillColor = isOn
+            ? UIColor(red: 1.0, green: 0.4, blue: 0.0, alpha: 0.3)
+            : UIColor(white: 1.0, alpha: 0.05)
+        debugButtonBg.strokeColor = isOn
+            ? UIColor(red: 1.0, green: 0.6, blue: 0.0, alpha: 0.9)
+            : UIColor(white: 1.0, alpha: 0.25)
+        debugButtonBg.lineWidth = 1.5
+        debugButtonBg.zPosition = 10
+        debugButtonBg.name = "debugButton"
+        addChild(debugButtonBg)
+
+        debugButtonLabel = SKLabelNode(text: isOn ? "🔓 DEBUG ON" : "🔒 DEBUG")
+        debugButtonLabel.fontName = "AvenirNext-Bold"
+        debugButtonLabel.fontSize = 11
+        debugButtonLabel.fontColor = isOn
+            ? UIColor(red: 1.0, green: 0.7, blue: 0.2, alpha: 1.0)
+            : UIColor(white: 1.0, alpha: 0.45)
+        debugButtonLabel.horizontalAlignmentMode = .center
+        debugButtonLabel.verticalAlignmentMode = .center
+        debugButtonLabel.zPosition = 11
+        debugButtonLabel.name = "debugButton"
+        debugButtonBg.addChild(debugButtonLabel)
+    }
+
+    private func toggleDebugMode() {
+        let isOn = !UserDefaults.standard.bool(forKey: "debugMode")
+        UserDefaults.standard.set(isOn, forKey: "debugMode")
+
+        debugButtonBg.fillColor = isOn
+            ? UIColor(red: 1.0, green: 0.4, blue: 0.0, alpha: 0.3)
+            : UIColor(white: 1.0, alpha: 0.05)
+        debugButtonBg.strokeColor = isOn
+            ? UIColor(red: 1.0, green: 0.6, blue: 0.0, alpha: 0.9)
+            : UIColor(white: 1.0, alpha: 0.25)
+        debugButtonLabel.text = isOn ? "🔓 DEBUG ON" : "🔒 DEBUG"
+        debugButtonLabel.fontColor = isOn
+            ? UIColor(red: 1.0, green: 0.7, blue: 0.2, alpha: 1.0)
+            : UIColor(white: 1.0, alpha: 0.45)
+
+        let pop = SKAction.sequence([
+            SKAction.scale(to: 1.15, duration: 0.08),
+            SKAction.scale(to: 1.0, duration: 0.08)
+        ])
+        debugButtonBg.run(pop)
+    }
+
     // MARK: - Demo Balls
 
     private func setupDemoBalls() {
@@ -254,6 +310,10 @@ class TitleScene: SKScene {
         for node in nodes {
             if node.name == "settingsButton" {
                 goToSettings()
+                return
+            }
+            if node.name == "debugButton" {
+                toggleDebugMode()
                 return
             }
         }
