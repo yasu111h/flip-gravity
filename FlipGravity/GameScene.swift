@@ -95,6 +95,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     private var canRotate = true
     private var spawnPoint = CGPoint.zero
     private var blinkingFloors: [SKShapeNode: Bool] = [:]
+    private var blinkingFloorRects: [CGRect] = []   // リスポーン時に再生成するための初期rect
 
     convenience init(size: CGSize, stageIndex: Int) {
         self.init(size: CGSize(width: 390, height: 840))
@@ -848,12 +849,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // プレイエリア: col 1〜12, row 1〜24
 
     private func addDebugGrid() {
-        let lineColor  = UIColor(red: 0.0, green: 1.0, blue: 0.5, alpha: 0.18)
-        let labelMain  = UIColor(red: 0.0, green: 1.0, blue: 0.5, alpha: 0.85)
-        let labelSub   = UIColor(red: 0.0, green: 1.0, blue: 0.5, alpha: 0.40)
+        let lineColor = UIColor(red: 0.0, green: 1.0, blue: 0.5, alpha: 0.18)
+        let labelMain = UIColor(red: 0.0, green: 1.0, blue: 0.5, alpha: 0.85)
+        let labelSub  = UIColor(red: 0.0, green: 1.0, blue: 0.5, alpha: 0.40)
 
-        // ── 縦線 + col ラベル ──
-        // col 0〜13（セル境界線）
+        func makeLbl(_ text: String, fontSize: CGFloat, color: UIColor,
+                     hAlign: SKLabelHorizontalAlignmentMode,
+                     vAlign: SKLabelVerticalAlignmentMode,
+                     pos: CGPoint) {
+            let lbl = SKLabelNode(text: text)
+            lbl.fontName = "AvenirNext-Medium"
+            lbl.fontSize = fontSize
+            lbl.fontColor = color
+            lbl.horizontalAlignmentMode = hAlign
+            lbl.verticalAlignmentMode = vAlign
+            lbl.position = pos
+            lbl.zPosition = 56
+            addChild(lbl)
+        }
+
+        // ── 縦線 + col ラベル（上下2辺）──
         for col in 0...13 {
             let x = CGFloat(col) * C
             let path = CGMutablePath()
@@ -865,21 +880,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             line.zPosition = 55
             addChild(line)
 
-            // プレイエリア内のcol（1〜12）にラベル
             guard col >= 1 && col <= 12 else { continue }
-            let lbl = SKLabelNode(text: "c\(col)")
-            lbl.fontName = "AvenirNext-Medium"
-            lbl.fontSize = col % 2 == 0 ? 8 : 6
-            lbl.fontColor = col % 2 == 0 ? labelMain : labelSub
-            lbl.horizontalAlignmentMode = .center
-            lbl.verticalAlignmentMode = .bottom
-            lbl.position = CGPoint(x: x + C / 2, y: C + 2)   // 各セルの中央、床の上
-            lbl.zPosition = 56
-            addChild(lbl)
+            let fs: CGFloat = col % 2 == 0 ? 8 : 6
+            let fc = col % 2 == 0 ? labelMain : labelSub
+            let txt = "c\(col)"
+            // 下辺：ライン(x)のすぐ右→左端を示す
+            makeLbl(txt, fontSize: fs, color: fc, hAlign: .left, vAlign: .top,
+                    pos: CGPoint(x: x + 2, y: C - 2))
+            // 上辺
+            makeLbl(txt, fontSize: fs, color: fc, hAlign: .left, vAlign: .bottom,
+                    pos: CGPoint(x: x + 2, y: 25 * C + 2))
         }
 
-        // ── 横線 + row ラベル ──
-        // row 0〜28（セル境界線）
+        // ── 横線 + row ラベル（左右2辺）──
         for row in 0...28 {
             let y = CGFloat(row) * C
             let path = CGMutablePath()
@@ -891,36 +904,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             line.zPosition = 55
             addChild(line)
 
-            // プレイエリア内のrow（1〜24）にラベル
             guard row >= 1 && row <= 24 else { continue }
-            let lbl = SKLabelNode(text: "r\(row)")
-            lbl.fontName = "AvenirNext-Medium"
-            lbl.fontSize = row % 2 == 0 ? 8 : 6
-            lbl.fontColor = row % 2 == 0 ? labelMain : labelSub
-            lbl.horizontalAlignmentMode = .left
-            lbl.verticalAlignmentMode = .center
-            lbl.position = CGPoint(x: C + 2, y: y + C / 2)   // 左壁の右、各セルの中央
-            lbl.zPosition = 56
-            addChild(lbl)
+            let fs: CGFloat = row % 2 == 0 ? 8 : 6
+            let fc = row % 2 == 0 ? labelMain : labelSub
+            let txt = "r\(row)"
+            // 左辺：ライン(y)のすぐ上→下端を示す（少し下にずらして下側を指す）
+            makeLbl(txt, fontSize: fs, color: fc, hAlign: .left, vAlign: .top,
+                    pos: CGPoint(x: C + 2, y: y - 1))
+            // 右辺
+            makeLbl(txt, fontSize: fs, color: fc, hAlign: .right, vAlign: .top,
+                    pos: CGPoint(x: 12 * C - 2, y: y - 1))
         }
-
-        // ── 情報バッジ ──
-        let infoNode = SKShapeNode(rectOf: CGSize(width: 170, height: 36), cornerRadius: 6)
-        infoNode.position = CGPoint(x: size.width - 95, y: size.height - 90)
-        infoNode.fillColor = UIColor(red: 0, green: 0.1, blue: 0, alpha: 0.75)
-        infoNode.strokeColor = UIColor(red: 0.0, green: 1.0, blue: 0.5, alpha: 0.6)
-        infoNode.lineWidth = 1
-        infoNode.zPosition = 115
-        addChild(infoNode)
-
-        let infoText = SKLabelNode(text: "GRID C=\(Int(C))pt  13col×28row")
-        infoText.fontName = "AvenirNext-Bold"
-        infoText.fontSize = 10
-        infoText.fontColor = UIColor(red: 0.0, green: 1.0, blue: 0.5, alpha: 1.0)
-        infoText.horizontalAlignmentMode = .center
-        infoText.verticalAlignmentMode = .center
-        infoText.zPosition = 116
-        infoNode.addChild(infoText)
     }
 
         // MARK: - Node Factories
@@ -1070,6 +1064,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     private func addBlinkingFloor(rect: CGRect) {
+        blinkingFloorRects.append(rect)
         let node = SKShapeNode(rect: rect)
         let theme = ThemeManager.shared
         node.fillColor = theme.blinkFloorFillColor
@@ -1326,8 +1321,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             self.gravityDirection = .down
             self.physicsWorld.gravity = self.gravityDirection.vector
             self.updateHUD()
+            self.restoreBlinkingFloors()
             self.spawnPlayer()
         }
+    }
+
+    private func restoreBlinkingFloors() {
+        for node in blinkingFloors.keys { node.removeFromParent() }
+        blinkingFloors.removeAll()
+        let rects = blinkingFloorRects
+        blinkingFloorRects.removeAll()
+        for rect in rects { addBlinkingFloor(rect: rect) }
     }
 
     // MARK: - Clear
