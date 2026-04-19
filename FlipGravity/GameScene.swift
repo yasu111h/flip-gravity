@@ -335,9 +335,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addFloor(x: 6, y: 10, w: 3)
         addFloor(x: 8, y: 18, w: 3)
         addFloor(x: 1, y: 13, w: 3)
-        addFloor(x: 4, y: 20.5, w: 3)
+        addFloor(x: 5, y: 20.5, w: 3)
         addSpike(col: 1, row: 1, direction: .up)
-        addSpike(col: 1.5, row: 1, direction: .up)
+        addSpike(col: 2, row: 1, direction: .up)
         addSpike(col: 8, row: 10.5, direction: .up)
         addSpike(col: 9.5, row: 24, direction: .down)
         addLava(x: 4, y: 1, w: 5)
@@ -360,18 +360,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addFloor(x: 5, y: 1, w: 0.5, h: 14, isTerrain: true)
         // 縦仕切り右: x=7.5, y=12, w=0.5, h=14
         addFloor(x: 7.5, y: 12, w: 0.5, h: 12, isTerrain: true)
-        // 足場左中段
+        // 足場左
         addFloor(x: 1, y: 8, w: 3)
-        // 足場左上段
+        addFloor(x: 1, y: 11, w: 2.5)
         addFloor(x: 1, y: 15, w: 3)
-        // 足場右中段
-        addFloor(x: 8, y: 7, w: 2.5)
-        // 足場右上段（ゴール台）
+        // 足場右
         addFloor(x: 8, y: 17, w: 2.5)
+        // スパイク
         addSpike(col: 2, row: 24, direction: .down)
         addSpike(col: 8.5, row: 1, direction: .up)
         addSpike(col: 10.5, row: 1, direction: .up)
-        addLava(x: 1, y: 11, w: 2.5)
+//        addLava(x: 1, y: 11, w: 2.5)
         addGoal(col: 8, row: 17.5)
         spawnPlayer()
     }
@@ -384,7 +383,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       上向き重力に切り替えて上半分を渡るのが攻略の鍵。
     // ─────────────────────────────────────────────
     private func buildStage3() {
-        spawnPoint = gp(1.5, 16.5)
+        spawnPoint = gp(1.5, 12)
         addOuterWalls()
         // 溶岩（下半分・h を明示して縦に大きく）
         addLava(x: 1, y: 1, w: 8, h: 10)      // 左下大溶岩
@@ -395,11 +394,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addFloor(x: 8, y: 15, w: 2.5)    // 右中段足場（ゴール台）
         addFloor(x: 4, y: 22.5, w: 4.5)    // 最上段足場
         addFloor(x: 1, y: 11, w: 4)    // 中段左の中継
+        addFloor(x: 9, y: 11, w: 1)    // 中段左の中継
         // 天井スパイク
         addSpike(col: 2.5, row: 24, direction: .down)
         addSpike(col: 9.5, row: 24, direction: .down)
         // ゴール
-        addGoal(col: 9, row: 15.5)
+        addGoal(col: 8, row: 15.5)
         spawnPlayer()
     }
 
@@ -472,7 +472,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //       S字を描くような進行ルート。消える床が中継地点に1枚。
     // ─────────────────────────────────────────────
     private func buildStage6() {
-        spawnPoint = gp(1.5, 2.5)
+        spawnPoint = gp(1.5, 3.5)
         addOuterWalls()
         // 左側の足場
         addFloor(x: 1, y: 2.5, w: 3.5)   // L1: 左下スタート台
@@ -483,7 +483,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // 右側の足場
         addFloor(x: 8, y: 12, w: 2.5)    // R1: 右中段
         addFloor(x: 6, y: 20, w: 4.5)    // R2: 右上段
-        addFloor(x: 17.5, y: 10, w: 1)    //
+//        addFloor(x: 10, y: 17.5, w: 1, h: 1.5)    // スパイクブロック
+        addFloor(x: 10, y: 17.5, w: 1)    // スパイクブロック
         // 壁
         addFloor(x: 4, y: 16.5, w: platformThickCells, h: 7)    // 縦長の壁
         // 消える床
@@ -496,6 +497,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addSpike(col: 1, row: 24, direction: .down)
         addSpike(col: 22, row: 5, direction: .right)
         addSpike(col: 4.5, row: 16.5, direction: .up)
+        addSpike(col: 4.5, row: 22.5, direction: .right)
         // 溶岩
         addLava(x: 9.5, y: 1, w: 1, h: 4)
         // ゴール
