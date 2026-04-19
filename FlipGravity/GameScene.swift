@@ -82,8 +82,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // 1セル = 30pt。シーンサイズ固定: 390×840
     // 列: 0=左壁左端 〜 13=右壁右端、行: 0=床下端 〜 26=天井ライン
     private let C: CGFloat = 30
-    private let ballSizeCells: CGFloat = 1   // ボールサイズ（セル単位）1=1マス分
-    private let goalSizeCells: CGFloat = 1   // ゴールサイズ（セル単位）1=1マス分
+    private let ballSizeCells: CGFloat = 1       // ボールサイズ（セル単位）1=1マス分
+    private let goalSizeCells: CGFloat = 2        // ゴールサイズ（セル単位）1=1マス分
+    private let platformThickCells: CGFloat = 1  // 床・溶岩・消える床のデフォルト厚み（セル単位）1=1マス分
     private var gravityDirection: GravityDirection = .down
     private var playerNode: SKShapeNode!
     private var deathCount = 0
@@ -941,17 +942,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     private func gs(_ cols: CGFloat, _ rows: CGFloat) -> CGSize {
         CGSize(width: cols * C, height: rows * C)
     }
-    /// グリッド座標版 addFloor
-    private func addFloor(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat = 1.0, isTerrain: Bool = false) {
-        addFloor(rect: CGRect(x: x * C, y: y * C, width: w * C, height: h * C), isTerrain: isTerrain)
+    /// グリッド座標版 addFloor（h省略時は platformThickCells を使用）
+    private func addFloor(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat? = nil, isTerrain: Bool = false) {
+        let height = h ?? platformThickCells
+        addFloor(rect: CGRect(x: x * C, y: y * C, width: w * C, height: height * C), isTerrain: isTerrain)
     }
-    /// グリッド座標版 addLava
-    private func addLava(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat = 1.0) {
-        addLava(rect: CGRect(x: x * C, y: y * C, width: w * C, height: h * C))
+    /// グリッド座標版 addLava（h省略時は platformThickCells を使用）
+    private func addLava(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat? = nil) {
+        let height = h ?? platformThickCells
+        addLava(rect: CGRect(x: x * C, y: y * C, width: w * C, height: height * C))
     }
-    /// グリッド座標版 addBlinkingFloor
-    private func addBlinkingFloor(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat = 1.0) {
-        addBlinkingFloor(rect: CGRect(x: x * C, y: y * C, width: w * C, height: h * C))
+    /// グリッド座標版 addBlinkingFloor（h省略時は platformThickCells を使用）
+    private func addBlinkingFloor(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat? = nil) {
+        let height = h ?? platformThickCells
+        addBlinkingFloor(rect: CGRect(x: x * C, y: y * C, width: w * C, height: height * C))
     }
     /// グリッド座標版 addSpike（(col,row) = スパイクが占める1セルの左下コーナー）
     private func addSpike(col: CGFloat, row: CGFloat, direction: SpikeDirection) {
