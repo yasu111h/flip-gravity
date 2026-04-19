@@ -83,6 +83,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // 列: 0=左壁左端 〜 13=右壁右端、行: 0=床下端 〜 26=天井ライン
     private let C: CGFloat = 30
     private let ballSizeCells: CGFloat = 1       // ボールサイズ（セル単位）1=1マス分
+    private let ballBodyRatio: CGFloat = 0.85    // ボール当たり判定の割合（1.0=視覚と同サイズ）
     private let goalSizeCells: CGFloat = 1.5        // ゴールサイズ（セル単位）1=1マス分
     private let platformThickCells: CGFloat = 0.5  // 床・溶岩・消える床のデフォルト厚み（セル単位）1=1マス分
     private var gravityDirection: GravityDirection = .down
@@ -1143,7 +1144,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         crossNode.lineWidth = 1.5
         crossNode.zPosition = 1
         playerNode.addChild(crossNode)
-        let body = SKPhysicsBody(circleOfRadius: radius * 0.85)
+        let body = SKPhysicsBody(circleOfRadius: radius * ballBodyRatio)
         body.isDynamic = true
         body.restitution = 0.1
         body.friction = 0.3
